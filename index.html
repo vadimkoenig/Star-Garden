@@ -195,7 +195,7 @@
     <div class="modal-overlay" id="tutorialModal">
         <div class="modal"><h2>📖 Обучение</h2><p id="tutorialText"></p><button class="close-btn" id="closeTutorial">Понятно</button></div>
     </div>
-    <script>
+<script>
 // ==================== ЧАСТЬ 2: ПОЛНЫЙ JS-КОД ИГРЫ ====================
 (function() {
     // ---------- ЯЗЫКИ ----------
@@ -725,6 +725,139 @@
                     ctx.fillRect(-s * 0.1, -s * 0.5, s * 0.2, s);
                     ctx.fillRect(-s * 0.5, -s * 0.5, s * 0.2, s);
                     break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(0, -s);
+                    ctx.lineTo(s * 0.8, s * 0.6);
+                    ctx.lineTo(-s * 0.8, s * 0.6);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'square':
+                    ctx.fillRect(-s * 0.8, -s * 0.8, s * 1.6, s * 1.6);
+                    break;
+                case 'dog':
+                    ctx.beginPath();
+                    ctx.arc(0, 0, s * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(-s * 0.4, -s * 0.5, s * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(s * 0.4, -s * 0.5, s * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(0, s * 0.1, s * 0.15, 0, Math.PI);
+                    ctx.fill();
+                    break;
+                case 'hamster':
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, s * 0.9, s * 0.7, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(-s * 0.25, -s * 0.3, s * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(s * 0.25, -s * 0.3, s * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffb6c1';
+                    ctx.beginPath();
+                    ctx.arc(0, s * 0.3, s * 0.12, 0, Math.PI);
+                    ctx.fill();
+                    break;
+                case 'oval':
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, s * 0.9, s * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'semicircle':
+                    ctx.beginPath();
+                    ctx.arc(0, 0, s, 0, Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'rectangle':
+                    ctx.fillRect(-s * 1.1, -s * 0.6, s * 2.2, s * 1.2);
+                    break;
+                case 'goldbar':
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillRect(-s * 0.9, -s * 0.5, s * 1.8, s * 1.0);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(-s * 0.7, -s * 0.2, s * 1.4, s * 0.2);
+                    break;
+                case 'sunflower':
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, s * 0.7, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#8B4513';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, s * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    for (let i = 0; i < 8; i++) {
+                        const a = i * Math.PI / 4;
+                        ctx.fillStyle = '#ffdd00';
+                        ctx.beginPath();
+                        ctx.ellipse(Math.cos(a) * s * 0.5, Math.sin(a) * s * 0.5, s * 0.25, s * 0.1, a, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    break;
+                case 'egg':
+                    ctx.fillStyle = '#fefae0';
+                    ctx.beginPath();
+                    ctx.ellipse(0, -s * 0.1, s * 0.6, s * 0.75, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'chick':
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, s * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#ff9900';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -s * 0.5);
+                    ctx.lineTo(-s * 0.2, -s * 0.7);
+                    ctx.lineTo(s * 0.2, -s * 0.7);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(-s * 0.15, -s * 0.1, s * 0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(s * 0.15, -s * 0.1, s * 0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'leaf':
+                    ctx.fillStyle = '#4caf50';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, s * 0.7, s * 0.35, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#2e7d32';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(-s * 0.6, 0);
+                    ctx.lineTo(s * 0.6, 0);
+                    ctx.stroke();
+                    break;
+                case 'tree':
+                    ctx.fillStyle = '#228B22';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -s * 0.8);
+                    ctx.lineTo(-s * 0.6, 0);
+                    ctx.lineTo(s * 0.6, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-s * 0.1, 0, s * 0.2, s * 0.4);
+                    break;
+                case 'stick':
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-s * 0.15, -s * 0.7, s * 0.3, s * 1.4);
+                    break;
                 default:
                     ctx.beginPath();
                     for (let i = 0; i < 8; i++) {
@@ -852,14 +985,28 @@
             html += `<div class="shop-item"><span>🤖 Авто-посадка (ур.${autoPlantLvl}/20)</span><span>💰 ${autoPlantLvl >= 20 ? t('max') : Math.floor(100 * (autoPlantLvl + 1))}</span><button id="buyAutoPlant" ${autoPlantLvl >= 20 ? 'disabled' : ''}>${t('buy')}</button></div>`;
         } else if (tab === 'starskins') {
             const allSkins = [
-                { id: 'star4', name: '✦ Четырёхконечная', cost: 300 },
-                { id: 'star5', name: '⭐ Пятиконечная', cost: 350 },
-                { id: 'circle', name: '⚪ Кружок', cost: 250 },
-                { id: 'diamond', name: '💎 Ромбик', cost: 280 },
-                { id: 'cat', name: '🐱 Котик', cost: 500 },
-                { id: 'pixel', name: '👾 Пиксель', cost: 400 },
-                { id: 'moon', name: '🌙 Луна', cost: 450 },
-                { id: 'bee', name: '🐝 Пчела', cost: 380 }
+                {id:'star4', name:'✦ Четырёхконечная', cost:300},
+                {id:'star5', name:'⭐ Пятиконечная', cost:350},
+                {id:'triangle', name:'🔺 Треугольник', cost:200},
+                {id:'diamond', name:'💎 Ромбик', cost:280},
+                {id:'square', name:'🟪 Квадрат', cost:180},
+                {id:'cat', name:'🐱 Котик', cost:500},
+                {id:'dog', name:'🐶 Собачка', cost:300},
+                {id:'hamster', name:'🐹 Хомяк', cost:300},
+                {id:'oval', name:'🥚 Овал', cost:190},
+                {id:'semicircle', name:'🌓 Полукруг', cost:170},
+                {id:'rectangle', name:'📏 Прямоугольник', cost:160},
+                {id:'goldbar', name:'💰 Слиток', cost:350},
+                {id:'circle', name:'⚪ Кружок', cost:250},
+                {id:'sunflower', name:'🌻 Подсолнух', cost:400},
+                {id:'egg', name:'🥚 Яйцо', cost:220},
+                {id:'chick', name:'🐤 Цыплёнок', cost:320},
+                {id:'leaf', name:'🍃 Листик', cost:240},
+                {id:'tree', name:'🌳 Дерево', cost:450},
+                {id:'stick', name:'🥢 Палка', cost:180},
+                {id:'pixel', name:'👾 Пиксель', cost:400},
+                {id:'moon', name:'🌙 Луна', cost:450},
+                {id:'bee', name:'🐝 Пчела', cost:380}
             ];
             allSkins.forEach(s => {
                 const owned = ownedStarSkins.includes(s.id);
@@ -871,12 +1018,12 @@
             });
         } else if (tab === 'groundskins') {
             const grounds = [
-                { id: 'green', name: '🌿 Зелёный', cost: 200 },
-                { id: 'pink', name: '🌸 Розовый', cost: 250 },
-                { id: 'gold', name: '✨ Золотой', cost: 300 },
-                { id: 'snow', name: '❄️ Снежный', cost: 280 },
-                { id: 'lava', name: '🌋 Лавовый', cost: 350 },
-                { id: 'night', name: '🌑 Ночной', cost: 220 }
+                {id:'green', name:'🌿 Зелёный', cost:200},
+                {id:'pink', name:'🌸 Розовый', cost:250},
+                {id:'gold', name:'✨ Золотой', cost:300},
+                {id:'snow', name:'❄️ Снежный', cost:280},
+                {id:'lava', name:'🌋 Лавовый', cost:350},
+                {id:'night', name:'🌑 Ночной', cost:220}
             ];
             grounds.forEach(s => {
                 const owned = ownedGroundSkins.includes(s.id);
@@ -892,89 +1039,48 @@
 
         setTimeout(() => {
             document.getElementById('buyTempX2')?.addEventListener('click', () => {
-                if (coins >= tempPrices.x2) {
-                    coins -= tempPrices.x2;
-                    tempMult = 2;
-                    tempMultTimer = 600;
-                    tempCounts.x2++;
-                    tempPrices.x2 = Math.floor(100 * Math.pow(1.5, tempCounts.x2));
-                    sfxBuy();
-                    renderShop('temp');
-                }
+                if (coins >= tempPrices.x2) { coins -= tempPrices.x2; tempMult = 2; tempMultTimer = 600; tempCounts.x2++; tempPrices.x2 = Math.floor(100 * Math.pow(1.5, tempCounts.x2)); sfxBuy(); renderShop('temp'); }
             });
             document.getElementById('buySlow')?.addEventListener('click', () => {
-                if (coins >= tempPrices.slow) {
-                    coins -= tempPrices.slow;
-                    slowMotion = true;
-                    slowTimer = 300;
-                    tempCounts.slow++;
-                    tempPrices.slow = Math.floor(80 * Math.pow(1.4, tempCounts.slow));
-                    sfxBuy();
-                    renderShop('temp');
-                }
+                if (coins >= tempPrices.slow) { coins -= tempPrices.slow; slowMotion = true; slowTimer = 300; tempCounts.slow++; tempPrices.slow = Math.floor(80 * Math.pow(1.4, tempCounts.slow)); sfxBuy(); renderShop('temp'); }
             });
             document.getElementById('buyMagnet')?.addEventListener('click', () => {
-                if (coins >= tempPrices.magnet) {
-                    coins -= tempPrices.magnet;
-                    magnetActive = true;
-                    magnetTimer = 480;
-                    tempCounts.magnet++;
-                    tempPrices.magnet = Math.floor(60 * Math.pow(1.3, tempCounts.magnet));
-                    sfxBuy();
-                    renderShop('temp');
-                }
+                if (coins >= tempPrices.magnet) { coins -= tempPrices.magnet; magnetActive = true; magnetTimer = 480; tempCounts.magnet++; tempPrices.magnet = Math.floor(60 * Math.pow(1.3, tempCounts.magnet)); sfxBuy(); renderShop('temp'); }
             });
             document.getElementById('buyCollectAll')?.addEventListener('click', () => {
-                if (coins >= tempPrices.collectAll && fallingStars.length > 0) {
-                    coins -= tempPrices.collectAll;
-                    [...fallingStars].forEach(s => catchStar(s));
-                    tempCounts.collectAll++;
-                    tempPrices.collectAll = Math.floor(150 * Math.pow(1.6, tempCounts.collectAll));
-                    sfxBuy();
-                    renderShop('temp');
-                }
+                if (coins >= tempPrices.collectAll && fallingStars.length > 0) { coins -= tempPrices.collectAll; [...fallingStars].forEach(s => catchStar(s)); tempCounts.collectAll++; tempPrices.collectAll = Math.floor(150 * Math.pow(1.6, tempCounts.collectAll)); sfxBuy(); renderShop('temp'); }
             });
             document.getElementById('buyPermMult')?.addEventListener('click', () => {
-                const cost = Math.floor(200 * Math.pow(2.0, permMultLvl - 1));
-                if (coins >= cost && permMultLvl < 20) { coins -= cost; permMultLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(200 * Math.pow(2.0, permMultLvl - 1)); if (coins >= cost && permMultLvl < 20) { coins -= cost; permMultLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buyLuck')?.addEventListener('click', () => {
-                const cost = Math.floor(150 * (luckLvl + 1));
-                if (coins >= cost && luckLvl < 10) { coins -= cost; luckLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(150 * (luckLvl + 1)); if (coins >= cost && luckLvl < 10) { coins -= cost; luckLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buySlowPerm')?.addEventListener('click', () => {
-                const cost = Math.floor(120 * (slowPermLvl + 1));
-                if (coins >= cost && slowPermLvl < 10) { coins -= cost; slowPermLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(120 * (slowPermLvl + 1)); if (coins >= cost && slowPermLvl < 10) { coins -= cost; slowPermLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buyCursor')?.addEventListener('click', () => {
-                const cost = Math.floor(100 * (catchRadiusLvl + 1));
-                if (coins >= cost && catchRadiusLvl < 10) { coins -= cost; catchRadiusLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(100 * (catchRadiusLvl + 1)); if (coins >= cost && catchRadiusLvl < 10) { coins -= cost; catchRadiusLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buyStarSize')?.addEventListener('click', () => {
-                const cost = Math.floor(150 * (starSizeLvl + 1));
-                if (coins >= cost && starSizeLvl < 10) { coins -= cost; starSizeLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(150 * (starSizeLvl + 1)); if (coins >= cost && starSizeLvl < 10) { coins -= cost; starSizeLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buyAuto')?.addEventListener('click', () => {
-                const cost = Math.floor(300 * (autoCollectLvl + 1));
-                if (coins >= cost && autoCollectLvl < 5) { coins -= cost; autoCollectLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(300 * (autoCollectLvl + 1)); if (coins >= cost && autoCollectLvl < 5) { coins -= cost; autoCollectLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buySeedCap')?.addEventListener('click', () => {
-                const cost = Math.floor(250 * seedCapLvl);
-                if (coins >= cost && seedCapLvl < 10) { coins -= cost; seedCapLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(250 * seedCapLvl); if (coins >= cost && seedCapLvl < 10) { coins -= cost; seedCapLvl++; sfxBuy(); renderShop('perm'); }
             });
             document.getElementById('buyAutoPlant')?.addEventListener('click', () => {
-                const cost = Math.floor(100 * (autoPlantLvl + 1));
-                if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
+                const cost = Math.floor(100 * (autoPlantLvl + 1)); if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
             });
 
             document.querySelectorAll('.buySkin').forEach(b => b.addEventListener('click', () => {
-                const skin = b.dataset.skin, cost = parseInt(b.dataset.cost);
-                if (coins >= cost) { coins -= cost; ownedStarSkins.push(skin); starSkin = skin; sfxBuy(); renderShop('starskins'); }
+                const skin = b.dataset.skin, cost = parseInt(b.dataset.cost); if (coins >= cost) { coins -= cost; ownedStarSkins.push(skin); starSkin = skin; sfxBuy(); renderShop('starskins'); }
             }));
             document.querySelectorAll('.equipSkin').forEach(b => b.addEventListener('click', () => { starSkin = b.dataset.skin; renderShop('starskins'); }));
             document.querySelectorAll('.buyGround').forEach(b => b.addEventListener('click', () => {
-                const skin = b.dataset.skin, cost = parseInt(b.dataset.cost);
-                if (coins >= cost) { coins -= cost; ownedGroundSkins.push(skin); groundSkin = skin; sfxBuy(); renderShop('groundskins'); }
+                const skin = b.dataset.skin, cost = parseInt(b.dataset.cost); if (coins >= cost) { coins -= cost; ownedGroundSkins.push(skin); groundSkin = skin; sfxBuy(); renderShop('groundskins'); }
             }));
             document.querySelectorAll('.equipGround').forEach(b => b.addEventListener('click', () => { groundSkin = b.dataset.skin; renderShop('groundskins'); }));
         }, 50);
@@ -982,117 +1088,41 @@
 
     function initShopTabs() {
         const tabsContainer = document.getElementById('shopTabs');
-        tabsContainer.innerHTML = `
-            <button class="tab-btn active" data-tab="temp">${t('temp')}</button>
-            <button class="tab-btn" data-tab="perm">${t('perm')}</button>
-            <button class="tab-btn" data-tab="starskins">${t('starskins')}</button>
-            <button class="tab-btn" data-tab="groundskins">${t('groundskins')}</button>
-        `;
-        tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderShop(btn.dataset.tab);
-            });
-        });
+        tabsContainer.innerHTML = `<button class="tab-btn active" data-tab="temp">${t('temp')}</button><button class="tab-btn" data-tab="perm">${t('perm')}</button><button class="tab-btn" data-tab="starskins">${t('starskins')}</button><button class="tab-btn" data-tab="groundskins">${t('groundskins')}</button>`;
+        tabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => { tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderShop(btn.dataset.tab); }));
     }
 
     // ==================== САД ====================
-    function openGarden() {
-        document.getElementById('gardenSeedCount').textContent = seeds;
-        document.getElementById('autoPlantLevel').textContent = autoPlantLvl;
-        updateGardenUI();
-        document.getElementById('gardenModal').classList.add('active');
-    }
-
+    function openGarden() { document.getElementById('gardenSeedCount').textContent = seeds; document.getElementById('autoPlantLevel').textContent = autoPlantLvl; updateGardenUI(); document.getElementById('gardenModal').classList.add('active'); }
     function updateGardenUI() {
-        const statusP = document.getElementById('gardenStatus');
-        const timerP = document.getElementById('gardenTimer');
-        const plantBtn = document.getElementById('plantSeedBtn');
-        const harvestBtn = document.getElementById('harvestBtn');
-
-        if (gardenGrowing) {
-            statusP.textContent = '🌱 Растёт...';
-            timerP.style.display = 'block';
-            document.getElementById('gardenTimeLeft').textContent = Math.ceil(gardenTimer / 60);
-            plantBtn.style.display = 'none';
-            harvestBtn.style.display = 'none';
-        } else if (gardenReward) {
-            statusP.textContent = '🎁 Урожай готов!';
-            timerP.style.display = 'none';
-            plantBtn.style.display = 'none';
-            harvestBtn.style.display = 'inline-block';
-        } else {
-            statusP.textContent = 'Грядка пуста';
-            timerP.style.display = 'none';
-            plantBtn.style.display = seeds > 0 ? 'inline-block' : 'none';
-            plantBtn.disabled = seeds <= 0;
-            harvestBtn.style.display = 'none';
-        }
+        const sp = document.getElementById('gardenStatus'), tp = document.getElementById('gardenTimer'), pb = document.getElementById('plantSeedBtn'), hb = document.getElementById('harvestBtn');
+        if (gardenGrowing) { sp.textContent = '🌱 Растёт...'; tp.style.display = 'block'; document.getElementById('gardenTimeLeft').textContent = Math.ceil(gardenTimer / 60); pb.style.display = 'none'; hb.style.display = 'none'; }
+        else if (gardenReward) { sp.textContent = '🎁 Урожай готов!'; tp.style.display = 'none'; pb.style.display = 'none'; hb.style.display = 'inline-block'; }
+        else { sp.textContent = 'Грядка пуста'; tp.style.display = 'none'; pb.style.display = seeds > 0 ? 'inline-block' : 'none'; pb.disabled = seeds <= 0; hb.style.display = 'none'; }
     }
-
-    function plantSeed() {
-        if (seeds <= 0 || gardenGrowing || gardenReward) return;
-        seeds--;
-        seedsPlanted++;
-        gardenGrowing = true;
-        gardenReward = null;
-        gardenTimer = 7200;
-        updateUI();
-        updateGardenUI();
-    }
-
+    function plantSeed() { if (seeds <= 0 || gardenGrowing || gardenReward) return; seeds--; seedsPlanted++; gardenGrowing = true; gardenReward = null; gardenTimer = 7200; updateUI(); updateGardenUI(); }
     function harvestReady() {
         const r = Math.random();
         if (r < 0.35) gardenReward = { type: 'buff', buff: 'x2' };
         else if (r < 0.65) gardenReward = { type: 'buff', buff: 'slow' };
         else if (r < 0.85) gardenReward = { type: 'buff', buff: 'magnet' };
-        else if (r < 0.99) {
-            const allSkins = ['star4', 'star5', 'circle', 'diamond', 'cat', 'pixel', 'moon', 'bee'];
-            const avail = allSkins.filter(s => !ownedStarSkins.includes(s));
-            gardenReward = avail.length > 0 ? { type: 'skin', skin: avail[Math.floor(Math.random() * avail.length)] } : { type: 'buff', buff: 'x2' };
-        } else {
-            gardenReward = { type: 'skin', skin: 'crown' };
-        }
+        else if (r < 0.99) { const all = ['star4','star5','circle','diamond','cat','pixel','moon','bee']; const avail = all.filter(s => !ownedStarSkins.includes(s)); gardenReward = avail.length > 0 ? { type: 'skin', skin: avail[Math.floor(Math.random() * avail.length)] } : { type: 'buff', buff: 'x2' }; }
+        else { gardenReward = { type: 'skin', skin: 'crown' }; }
         updateGardenUI();
     }
-
     function harvestPlant() {
-        if (!gardenReward) return;
-        sfxHarvest();
-        if (gardenReward.type === 'buff') {
-            switch (gardenReward.buff) {
-                case 'x2': tempMult = 2; tempMultTimer = 2700; break;
-                case 'slow': slowMotion = true; slowTimer = 2700; break;
-                case 'magnet': magnetActive = true; magnetTimer = 2700; break;
-            }
-        } else if (gardenReward.type === 'skin') {
-            if (!ownedStarSkins.includes(gardenReward.skin)) ownedStarSkins.push(gardenReward.skin);
-            starSkin = gardenReward.skin;
-        }
-        gardenReward = null;
-        gardenGrowing = false;
-        updateGardenUI();
+        if (!gardenReward) return; sfxHarvest();
+        if (gardenReward.type === 'buff') { switch (gardenReward.buff) { case 'x2': tempMult = 2; tempMultTimer = 2700; break; case 'slow': slowMotion = true; slowTimer = 2700; break; case 'magnet': magnetActive = true; magnetTimer = 2700; break; } }
+        else if (gardenReward.type === 'skin') { if (!ownedStarSkins.includes(gardenReward.skin)) ownedStarSkins.push(gardenReward.skin); starSkin = gardenReward.skin; }
+        gardenReward = null; gardenGrowing = false; updateGardenUI();
     }
 
     // ==================== СТАТИСТИКА ====================
     function renderStats() {
         const tops = JSON.parse(localStorage.getItem('starGardenTops') || '{"coins":[],"time":[],"caught":[],"seeds":[]}');
         let html = `<p style="margin-bottom:10px;">👥 ${t('totalPlayers')} ${Math.max(tops.coins.length, tops.time.length, tops.caught.length, tops.seeds.length)}</p>`;
-        const categories = [
-            { key: 'coins', title: t('statCoins'), prop: 'value' },
-            { key: 'time', title: t('statTime'), prop: 'time' },
-            { key: 'caught', title: t('statCaught'), prop: 'caught' },
-            { key: 'seeds', title: t('statSeeds'), prop: 'seeds' }
-        ];
-        categories.forEach(cat => {
-            html += `<p style="color:var(--gold); margin-top:10px;">${cat.title}</p>`;
-            html += '<table class="stats-table"><tr><th>#</th><th>Имя</th><th>' + (cat.key === 'coins' ? 'Монеты' : cat.key === 'time' ? 'Секунд' : 'Звёзд') + '</th></tr>';
-            (tops[cat.key] || []).slice(0, 5).forEach((e, i) => {
-                html += `<tr><td>${i + 1}</td><td>${e.name}</td><td>${e[cat.prop]}</td></tr>`;
-            });
-            html += '</table>';
-        });
+        const categories = [ { key:'coins', title:t('statCoins'), prop:'value' }, { key:'time', title:t('statTime'), prop:'time' }, { key:'caught', title:t('statCaught'), prop:'caught' }, { key:'seeds', title:t('statSeeds'), prop:'seeds' } ];
+        categories.forEach(cat => { html += `<p style="color:var(--gold); margin-top:10px;">${cat.title}</p><table class="stats-table"><tr><th>#</th><th>Имя</th><th>${cat.key==='coins'?'Монеты':cat.key==='time'?'Секунд':'Звёзд'}</th></tr>`; (tops[cat.key]||[]).slice(0,5).forEach((e,i) => html += `<tr><td>${i+1}</td><td>${e.name}</td><td>${e[cat.prop]}</td></tr>`); html += '</table>'; });
         document.getElementById('statsContent').innerHTML = html;
     }
 
@@ -1113,79 +1143,48 @@
         updateUI();
     }
 
-    // Языки
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentLang = btn.dataset.lang;
-            localStorage.setItem('starGardenLang', currentLang);
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
-            updateAllTexts();
-        });
-    });
+    document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click',()=>{ currentLang=b.dataset.lang; localStorage.setItem('starGardenLang',currentLang); document.querySelectorAll('.lang-btn').forEach(b2=>b2.classList.toggle('active',b2.dataset.lang===currentLang)); updateAllTexts(); }));
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
 
-    // Кнопки
-    document.getElementById('playBtn').addEventListener('click', () => {
-        document.getElementById('mainMenu').style.display = 'none';
-        document.getElementById('gameScreen').style.display = 'flex';
-        gameRunning = true;
-        initAudio();
-        lastTime = Date.now();
-    });
-    document.getElementById('backToMenuBtn').addEventListener('click', () => {
-        gameRunning = false;
-        document.getElementById('gameScreen').style.display = 'none';
-        document.getElementById('mainMenu').style.display = 'flex';
-        saveGame();
-    });
-    document.getElementById('shopMenuBtn').addEventListener('click', () => { document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
-    document.getElementById('ingameShopBtn').addEventListener('click', () => { document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
-    document.getElementById('closeShop').addEventListener('click', () => document.getElementById('shopModal').classList.remove('active'));
-    document.getElementById('gardenMenuBtn').addEventListener('click', openGarden);
-    document.getElementById('ingameGardenBtn').addEventListener('click', openGarden);
-    document.getElementById('closeGarden').addEventListener('click', () => document.getElementById('gardenModal').classList.remove('active'));
-    document.getElementById('plantSeedBtn').addEventListener('click', plantSeed);
-    document.getElementById('harvestBtn').addEventListener('click', harvestPlant);
-    document.getElementById('settingsMenuBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.add('active'));
-    document.getElementById('closeSettings').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('active'));
-    document.getElementById('resetWaveBtn').addEventListener('click', () => {
-        wave = 1;
-        tempPrices = { x2: 100, slow: 80, magnet: 60, collectAll: 150 };
-        tempCounts = { x2: 0, slow: 0, magnet: 0, collectAll: 0 };
-        document.getElementById('settingsModal').classList.remove('active');
-    });
-    document.getElementById('statsMenuBtn').addEventListener('click', () => { document.getElementById('statsModal').classList.add('active'); renderStats(); });
-    document.getElementById('closeStats').addEventListener('click', () => document.getElementById('statsModal').classList.remove('active'));
-    document.getElementById('tutorialMenuBtn').addEventListener('click', () => { document.getElementById('tutorialText').innerHTML = t('tutorialText'); document.getElementById('tutorialModal').classList.add('active'); });
-    document.getElementById('closeTutorial').addEventListener('click', () => document.getElementById('tutorialModal').classList.remove('active'));
+    document.getElementById('playBtn').addEventListener('click',()=>{ document.getElementById('mainMenu').style.display='none'; document.getElementById('gameScreen').style.display='flex'; gameRunning=true; initAudio(); lastTime=Date.now(); });
+    document.getElementById('backToMenuBtn').addEventListener('click',()=>{ gameRunning=false; document.getElementById('gameScreen').style.display='none'; document.getElementById('mainMenu').style.display='flex'; saveGame(); });
+    document.getElementById('shopMenuBtn').addEventListener('click',()=>{ document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
+    document.getElementById('ingameShopBtn').addEventListener('click',()=>{ document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
+    document.getElementById('closeShop').addEventListener('click',()=>document.getElementById('shopModal').classList.remove('active'));
+    document.getElementById('gardenMenuBtn').addEventListener('click',openGarden);
+    document.getElementById('ingameGardenBtn').addEventListener('click',openGarden);
+    document.getElementById('closeGarden').addEventListener('click',()=>document.getElementById('gardenModal').classList.remove('active'));
+    document.getElementById('plantSeedBtn').addEventListener('click',plantSeed);
+    document.getElementById('harvestBtn').addEventListener('click',harvestPlant);
+    document.getElementById('settingsMenuBtn').addEventListener('click',()=>document.getElementById('settingsModal').classList.add('active'));
+    document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsModal').classList.remove('active'));
+    document.getElementById('resetWaveBtn').addEventListener('click',()=>{ wave=1; tempPrices={x2:100,slow:80,magnet:60,collectAll:150}; tempCounts={x2:0,slow:0,magnet:0,collectAll:0}; document.getElementById('settingsModal').classList.remove('active'); });
+    document.getElementById('statsMenuBtn').addEventListener('click',()=>{ document.getElementById('statsModal').classList.add('active'); renderStats(); });
+    document.getElementById('closeStats').addEventListener('click',()=>document.getElementById('statsModal').classList.remove('active'));
+    document.getElementById('tutorialMenuBtn').addEventListener('click',()=>{ document.getElementById('tutorialText').innerHTML=t('tutorialText'); document.getElementById('tutorialModal').classList.add('active'); });
+    document.getElementById('closeTutorial').addEventListener('click',()=>document.getElementById('tutorialModal').classList.remove('active'));
 
-    // Настройки темы/шрифта/неба
-    document.getElementById('themeSelect').addEventListener('change', function () { document.getElementById('bodyTheme').className = this.value; localStorage.setItem('starGardenTheme', this.value); });
-    document.getElementById('fontSelect').addEventListener('change', function () { document.body.style.setProperty('--font', this.value); localStorage.setItem('starGardenFont', this.value); });
-    document.getElementById('skySelect').addEventListener('change', function () { skySkin = this.value; localStorage.setItem('starGardenSky', this.value); });
+    document.getElementById('themeSelect').addEventListener('change',function(){ document.getElementById('bodyTheme').className=this.value; localStorage.setItem('starGardenTheme',this.value); });
+    document.getElementById('fontSelect').addEventListener('change',function(){ document.body.style.setProperty('--font',this.value); localStorage.setItem('starGardenFont',this.value); });
+    document.getElementById('skySelect').addEventListener('change',function(){ skySkin=this.value; localStorage.setItem('starGardenSky',this.value); });
 
-    const savedTheme = localStorage.getItem('starGardenTheme');
-    if (savedTheme) { document.getElementById('bodyTheme').className = savedTheme; document.getElementById('themeSelect').value = savedTheme; }
-    const savedFont = localStorage.getItem('starGardenFont');
-    if (savedFont) { document.body.style.setProperty('--font', savedFont); document.getElementById('fontSelect').value = savedFont; }
-    const savedSky = localStorage.getItem('starGardenSky');
-    if (savedSky) { skySkin = savedSky; document.getElementById('skySelect').value = savedSky; }
+    const savedTheme = localStorage.getItem('starGardenTheme'); if(savedTheme){ document.getElementById('bodyTheme').className=savedTheme; document.getElementById('themeSelect').value=savedTheme; }
+    const savedFont = localStorage.getItem('starGardenFont'); if(savedFont){ document.body.style.setProperty('--font',savedFont); document.getElementById('fontSelect').value=savedFont; }
+    const savedSky = localStorage.getItem('starGardenSky'); if(savedSky){ skySkin=savedSky; document.getElementById('skySelect').value=savedSky; }
 
-    // Канвас события
-    canvas.addEventListener('click', e => { const pos = getClickPos(e); mouseX = pos.x; mouseY = pos.y; handleClick(pos.x, pos.y); });
-    canvas.addEventListener('mousemove', e => { const pos = getClickPos(e); mouseX = pos.x; mouseY = pos.y; });
-    canvas.addEventListener('mouseleave', () => { mouseX = -100; mouseY = -100; });
-    canvas.addEventListener('touchstart', e => { e.preventDefault(); const pos = getClickPos(e.touches[0]); mouseX = pos.x; mouseY = pos.y; handleClick(pos.x, pos.y); }, { passive: false });
-    canvas.addEventListener('touchmove', e => { e.preventDefault(); const pos = getClickPos(e.touches[0]); mouseX = pos.x; mouseY = pos.y; }, { passive: false });
-    canvas.addEventListener('touchend', () => { mouseX = -100; mouseY = -100; });
+    canvas.addEventListener('click',e=>{ const pos=getClickPos(e); mouseX=pos.x; mouseY=pos.y; handleClick(pos.x,pos.y); });
+    canvas.addEventListener('mousemove',e=>{ const pos=getClickPos(e); mouseX=pos.x; mouseY=pos.y; });
+    canvas.addEventListener('mouseleave',()=>{ mouseX=-100; mouseY=-100; });
+    canvas.addEventListener('touchstart',e=>{ e.preventDefault(); const pos=getClickPos(e.touches[0]); mouseX=pos.x; mouseY=pos.y; handleClick(pos.x,pos.y); },{passive:false});
+    canvas.addEventListener('touchmove',e=>{ e.preventDefault(); const pos=getClickPos(e.touches[0]); mouseX=pos.x; mouseY=pos.y; },{passive:false});
+    canvas.addEventListener('touchend',()=>{ mouseX=-100; mouseY=-100; });
 
-    // Запуск
     loadGame();
     updateAllTexts();
     resizeCanvas();
     gameLoop();
 
-    console.log('🌟 Star Garden v2.0.1 активирован!');
+    console.log('🌟 Star Garden v2.0.1 готов! Все скины на месте.');
 })();
 </script>
 </body>
