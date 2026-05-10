@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ Star Garden v2.0.1</title>
+   <title>⭐ Star Garden v2.0.1</title>
     @media (max-width: 600px) {
     .ui-top { font-size: 0.9rem; gap: 8px; }
     .menu-btn, .shop-btn, .garden-btn { font-size: 0.85rem; padding: 6px 12px; }
@@ -11,8 +11,8 @@
     .modal { width: 90%; max-width: 95%; }
     .lang-btn { font-size: 0.9rem; padding: 4px 10px; }
 }
-    <style>
-        :root {
+<style>
+    :root {
             --bg: #0a0a1a;
             --ui-bg: rgba(20, 10, 40, 0.85);
             --text: #e0d8ff;
@@ -56,7 +56,6 @@
     width: 100%; max-width: 700px; height: 100vh; padding: 5px; position: relative;
     margin: 0 auto;
 }
-        }
         .lang-switch {
             position: absolute; top: 8px; right: 8px; background: var(--ui-bg);
             border-radius: 20px; padding: 4px 8px; display: flex; gap: 4px; z-index: 10;
@@ -236,6 +235,9 @@ function sfxBuy() { playTone(900, 'square', 0.08, 0.04); }
 function sfxError() { playTone(150, 'sawtooth', 0.2, 0.04); }
 
 // Канвас
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let W = 500, H = 520;
 function resizeCanvas() {
     const maxW = Math.min(window.innerWidth * 0.95, 700);
     const ratio = 500/520;
