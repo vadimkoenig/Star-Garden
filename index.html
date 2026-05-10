@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ Star Garden v2.0</title>
+    <title>⭐ Star Garden v2.0.1</title>
+    @media (max-width: 600px) {
+    .ui-top { font-size: 0.9rem; gap: 8px; }
+    .menu-btn, .shop-btn, .garden-btn { font-size: 0.85rem; padding: 6px 12px; }
+    .main-btn { font-size: 1.1rem; padding: 12px 25px; width: 200px; }
+    .modal { width: 90%; max-width: 95%; }
+    .lang-btn { font-size: 0.9rem; padding: 4px 10px; }
+}
     <style>
         :root {
             --bg: #0a0a1a;
@@ -39,14 +46,16 @@
             height: 100vh; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
             touch-action: manipulation; transition: background 0.5s;
         }
-        .game-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            width: 100vw; height: 100vh; padding: 5px; position: relative;
-        }
-        canvas {
-            border-radius: 20px; cursor: pointer;
-            box-shadow: 0 0 30px rgba(100,80,200,0.4), 0 0 60px rgba(80,60,180,0.15);
-            width: 100%; max-width: 500px; flex-shrink: 0;
+      canvas {
+    border-radius: 20px; cursor: pointer;
+    box-shadow: 0 0 30px rgba(100,80,200,0.4), 0 0 60px rgba(80,60,180,0.15);
+    width: 100%; max-width: 100%; flex-shrink: 0;
+}
+.game-wrapper {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    width: 100%; max-width: 700px; height: 100vh; padding: 5px; position: relative;
+    margin: 0 auto;
+}
         }
         .lang-switch {
             position: absolute; top: 8px; right: 8px; background: var(--ui-bg);
@@ -227,19 +236,14 @@ function sfxBuy() { playTone(900, 'square', 0.08, 0.04); }
 function sfxError() { playTone(150, 'sawtooth', 0.2, 0.04); }
 
 // Канвас
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-let W = 500, H = 520;
 function resizeCanvas() {
-    const maxW = Math.min(window.innerWidth * 0.95, 500);
+    const maxW = Math.min(window.innerWidth * 0.95, 700);
     const ratio = 500/520;
     canvas.style.width = maxW + 'px';
     canvas.style.height = (maxW / ratio) + 'px';
     W = 500; H = 520;
     canvas.width = W; canvas.height = H;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 function getClickPos(e) {
     const rect = canvas.getBoundingClientRect();
