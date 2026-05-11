@@ -1304,12 +1304,16 @@ canvas.addEventListener('touchmove', e => {
     mouseX = pos.x; mouseY = pos.y;
 }, { passive: false });
 canvas.addEventListener('touchend', () => { mouseX = -100; mouseY = -100; });
+// Загрузка игры и запуск
 loadGame();
 updateAllTexts();
 updateUI();
 resizeCanvas();
 
-// Принудительный запуск спавна звёзд
+canvas.width = 500;
+canvas.height = 520;
+W = 500;
+H = 520;
 gameRunning = true;
 lastTime = Date.now();
 gameLoop();
