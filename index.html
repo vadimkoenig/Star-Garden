@@ -345,7 +345,7 @@ function spawnStar() {
     if (slowMotion) speed *= 0.4;
     speed *= (1 - slowPermLvl * 0.04);
     fallingStars.push({
-        x: random(20, W-20), y: random(-40, -10), speed,
+        x: random(20, W-20), y: random(-300, -50), speed,
         size: type.size * sizeMult,
         hue: type.hue === -1 ? frameCount%360 : type.hue,
         value: type.value, type, twinkle: random(0, Math.PI*2),
