@@ -765,6 +765,15 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// Гарантированный запуск
+gameRunning = false;
+setTimeout(() => {
+    if (!gameRunning) {
+        gameRunning = true;
+        lastTime = Date.now();
+    }
+}, 100);
+
 // ============ СОХРАНЕНИЕ ============
 function saveGame() {
     const save = {
