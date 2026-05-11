@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ Star Garden v2.0</title>
+    <title>⭐ Star Garden v2.0.2</title>
     <style>
         :root {
             --bg: #0a0a1a;
@@ -34,19 +34,32 @@
             --sky-top: #2a0a0a; --sky-bottom: #4a1a0a;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: var(--bg); font-family: var(--font); display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation; transition: background 0.5s;
+        html, body {
+            width: 100vw; max-width: 100vw;
+            overflow-x: hidden;
+            background: var(--bg);
+            font-family: var(--font);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background 0.5s;
         }
         .game-wrapper {
+            width: 100%;
+            max-width: 700px;
+            height: 100vh;
             display: flex; flex-direction: column; align-items: center; gap: 5px;
-            width: 100vw; height: 100vh; padding: 5px; position: relative;
+            padding: 5px; margin: 0 auto;
+            box-sizing: border-box;
+            position: relative;
         }
         canvas {
             border-radius: 20px; cursor: pointer;
             box-shadow: 0 0 30px rgba(100,80,200,0.4), 0 0 60px rgba(80,60,180,0.15);
-            width: 100%; max-width: 500px; flex-shrink: 0;
+            width: auto; max-width: 100%; flex-shrink: 0;
         }
         .lang-switch {
             position: absolute; top: 8px; right: 8px; background: var(--ui-bg);
@@ -110,25 +123,31 @@
         .stats-table { width:100%; margin:10px 0; border-collapse:collapse; font-size:0.75rem; }
         .stats-table th, .stats-table td { padding:5px; border-bottom:1px solid var(--border); }
         .stats-table th { color:var(--gold); }
-        .main-menu { display:flex; flex-direction:column; align-items:center; gap:10px; }
+        .main-menu { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; height:100%; width:100%; }
         .main-title { font-size:2rem; font-weight:300; color:var(--gold); text-shadow:0 0 20px var(--gold); letter-spacing:4px; }
         .main-btn {
             background:var(--btn-bg); border:2px solid var(--border); color:var(--text);
             padding:10px 25px; border-radius:30px; font-size:1rem; cursor:pointer;
-            transition:0.3s; width:180px; text-align:center; font-family:inherit;
+            transition:0.3s; width:200px; text-align:center; font-family:inherit;
         }
         .main-btn:hover { background:var(--btn-hover); border-color:var(--gold); color:var(--gold); }
+        @media (max-width: 600px) {
+            .ui-top { font-size: 0.9rem; gap: 8px; }
+            .menu-btn, .shop-btn, .garden-btn { font-size: 0.85rem; padding: 6px 12px; }
+            .main-btn { font-size: 1.1rem; padding: 12px 25px; width: 180px; }
+            .modal { width: 90%; max-width: 95%; }
+            .lang-btn { font-size: 0.9rem; padding: 4px 10px; }
+            .main-title { font-size: 1.6rem; }
+        }
     </style>
 </head>
 <body class="default" id="bodyTheme">
     <div class="game-wrapper">
-        <!-- Переключатель языка (всегда виден) -->
         <div class="lang-switch" id="langSwitch">
             <button class="lang-btn active" data-lang="ru">🇷🇺 РУС</button>
             <button class="lang-btn" data-lang="en">🇬🇧 ENG</button>
         </div>
 
-        <!-- ГЛАВНОЕ МЕНЮ -->
         <div id="mainMenu" class="main-menu" style="display:flex;">
             <div class="main-title" id="mainTitle">✦ STAR GARDEN v2.0 ✦</div>
             <button class="main-btn" id="playBtn">🎮 Играть</button>
@@ -139,7 +158,6 @@
             <button class="main-btn" id="tutorialMenuBtn">📖 Обучение</button>
         </div>
 
-        <!-- ЭКРАН ИГРЫ -->
         <div id="gameScreen" style="display:none; flex-direction:column; align-items:center; width:100%; gap:5px;">
             <canvas id="gameCanvas"></canvas>
             <div class="ui-top">
@@ -153,7 +171,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div class="modal-overlay" id="shopModal">
         <div class="modal"><h2>🛒 Магазин</h2><div class="tabs" id="shopTabs"></div><div id="shopContent"></div><button class="close-btn" id="closeShop">Закрыть</button></div>
     </div>
@@ -231,10 +248,11 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 let W = 500, H = 520;
 function resizeCanvas() {
-    const maxW = Math.min(window.innerWidth * 0.95, 500);
+    const maxW = Math.min(window.innerWidth - 20, 700);
     const ratio = 500/520;
     canvas.style.width = maxW + 'px';
     canvas.style.height = (maxW / ratio) + 'px';
+    canvas.style.maxWidth = '100%';
     W = 500; H = 520;
     canvas.width = W; canvas.height = H;
 }
@@ -253,16 +271,16 @@ let totalCaught = 0, wave = 1, coins = 0, seeds = 0;
 let frameCount = 0, mouseX = -100, mouseY = -100, gameRunning = false;
 
 // Улучшения
-let permMultLvl = 1;          // 1-20, множитель до x10
-let luckLvl = 0;              // удача
-let slowPermLvl = 0;          // постоянное замедление
-let catchRadiusLvl = 0;       // радиус курсора (0-10)
-let starSizeLvl = 0;          // размер звёзд (0-10)
-let autoCollectLvl = 0;       // автосбор (0-5)
-let seedCapLvl = 1;           // вместимость семян (1-10)
-let autoPlantLvl = 0;         // авто-посадка (0-20)
+let permMultLvl = 1;
+let luckLvl = 0;
+let slowPermLvl = 0;
+let catchRadiusLvl = 0;
+let starSizeLvl = 0;
+let autoCollectLvl = 0;
+let seedCapLvl = 1;
+let autoPlantLvl = 0;
 
-// Временные баффы (цены растут с каждой покупкой, сбрасываются вместе с волной)
+// Временные баффы
 let tempPrices = { x2: 100, slow: 80, magnet: 60, collectAll: 150 };
 let tempCounts = { x2: 0, slow: 0, magnet: 0, collectAll: 0 };
 let tempMult = 1, tempMultTimer = 0;
@@ -296,11 +314,11 @@ const starTypes = [
     { id: 'purple',  hue:280, size:8,  speed:1.2, value:25,   weight:14, seedChance:0.06,  doubleClick:false },
     { id: 'maroon',  hue:340, size:10, speed:2.0, value:50,   weight:5,  seedChance:0.04,  doubleClick:false },
     { id: 'black',   hue:0,   size:12, speed:3.8, value:100,  weight:4,  seedChance:0.20,  doubleClick:false },
-    { id: 'gold',    hue:45,  size:11, speed:4.5, value:1000, weight:0.3, seedChance:0.70,  doubleClick:false },
-    { id: 'cyan',    hue:180, size:9,  speed:3.2, value:500,  weight:2,  seedChance:0.40,  doubleClick:false },
-    { id: 'rainbow', hue:-1,  size:5,  speed:5.5, value:5000, weight:0.1, seedChance:0.90,  doubleClick:false },
-    { id: 'double',  hue:300, size:10, speed:2.5, value:300,  weight:1.5, seedChance:0.60,  doubleClick:true, clicksNeeded:2 },
-    { id: 'pixel',   hue:200, size:7,  speed:2.0, value:200,  weight:2,   seedChance:0.25,  doubleClick:false },
+    { id: 'gold',    hue:45,  size:11, speed:4.5, value:1000, weight:0.3, seedChance:0.70, doubleClick:false },
+    { id: 'cyan',    hue:180, size:9,  speed:3.2, value:500,  weight:2,  seedChance:0.40, doubleClick:false },
+    { id: 'rainbow', hue:-1,  size:5,  speed:5.5, value:5000, weight:0.1, seedChance:0.90, doubleClick:false },
+    { id: 'double',  hue:300, size:10, speed:2.5, value:300,  weight:1.5, seedChance:0.60, doubleClick:true, clicksNeeded:2 },
+    { id: 'pixel',   hue:200, size:7,  speed:2.0, value:200,  weight:2,   seedChance:0.25, doubleClick:false },
 ];
 
 function getMaxSeeds() { return Math.min(500, BASE_SEED_CAP + (seedCapLvl-1)*40); }
@@ -334,7 +352,7 @@ function spawnStar() {
         clicksRemaining: type.doubleClick ? type.clicksNeeded : 0
     });
 }
-// ============ ЧАСТЬ 2: ЛОГИКА, ОТРИСОВКА, МАГАЗИН, САД, СТАТИСТИКА ============
+    // ============ ЧАСТЬ 2: ЛОГИКА, ОТРИСОВКА, МАГАЗИН, САД, СТАТИСТИКА ============
 
 function catchStar(star) {
     let value = Math.floor(star.value * (1 + (permMultLvl-1)*0.45) * tempMult);
@@ -407,46 +425,40 @@ function update() {
     if (!gameRunning) return;
     frameCount++;
     
-    // Обновление времени игры
     const now = Date.now();
     if (now - lastTime >= 1000) {
         playTime++;
         lastTime = now;
     }
 
-    // Таймеры временных баффов
     if (tempMultTimer > 0 && --tempMultTimer <= 0) tempMult = 1;
     if (slowTimer > 0 && --slowTimer <= 0) slowMotion = false;
     if (magnetTimer > 0 && --magnetTimer <= 0) magnetActive = false;
 
-    // Сад
     if (gardenGrowing && --gardenTimer <= 0) {
         gardenGrowing = false;
         harvestReady();
         updateGardenUI();
     }
 
-    // Авто-посадка семян
     if (autoPlantLvl > 0 && !gardenGrowing && !gardenReward && seeds > 0) {
         autoPlantTimer++;
-        const interval = Math.max(30, 1200 - autoPlantLvl * 55); // от 20 сек до 0.5 сек на 20 уровне
+        const interval = Math.max(30, 1200 - autoPlantLvl * 55);
         if (autoPlantTimer >= interval) {
             autoPlantTimer = 0;
             seeds--;
             seedsPlanted++;
             gardenGrowing = true;
-            gardenTimer = 7200; // 120 секунд
+            gardenTimer = 7200;
             updateUI();
             updateGardenUI();
         }
     }
 
-    // Спавн звёзд
     if (frameCount % Math.max(14, 45 - wave*1.2) === 0) {
         spawnStar();
     }
 
-    // Движение звёзд
     for (let i = fallingStars.length-1; i >= 0; i--) {
         const star = fallingStars[i];
         if (magnetActive && dist(mouseX, mouseY, star.x, star.y) < 150) {
@@ -461,7 +473,6 @@ function update() {
         }
     }
 
-    // Частицы
     for (let i = particles.length-1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -471,17 +482,14 @@ function update() {
         if (p.life >= p.maxLife) particles.splice(i, 1);
     }
 
-    // Плавающий текст
     for (let i = floatingTexts.length-1; i >= 0; i--) {
         floatingTexts[i].y -= 0.7;
         floatingTexts[i].life--;
         if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
     }
 
-    // Анимация цветов
     for (const f of flowers) f.phase += 0.03;
 
-    // Автосбор
     if (autoCollectLvl > 0 && fallingStars.length > 0) {
         const interval = Math.max(30, 200 - autoCollectLvl * 35);
         if (frameCount % interval === 0) {
@@ -511,7 +519,6 @@ const skyGradients = {
 function draw() {
     ctx.clearRect(0, 0, W, H);
     
-    // Небо (сменный скин)
     const skyCols = skyGradients[skySkin] || skyGradients.default;
     const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
     skyGrad.addColorStop(0, skyCols[0]);
@@ -520,7 +527,6 @@ function draw() {
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, GROUND_Y);
 
-    // Звёзды фона
     if (!draw._stars) {
         draw._stars = [];
         for (let i=0; i<60; i++) {
@@ -537,13 +543,11 @@ function draw() {
         ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
     }
 
-    // Луна
     ctx.save(); ctx.translate(W*0.85, GROUND_Y*0.25);
     ctx.fillStyle = '#fffde8'; ctx.beginPath(); ctx.arc(0, 0, 25, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = skyCols[0]; ctx.beginPath(); ctx.arc(10, -4, 20, 0, Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Земля (скин травы)
     const groundColors = {
         green:  '#1a2e1a',
         pink:   '#2e1a2a',
@@ -555,7 +559,6 @@ function draw() {
     ctx.fillStyle = groundColors[groundSkin] || groundColors.green;
     ctx.fillRect(0, GROUND_Y, W, H-GROUND_Y);
 
-    // Цветы
     for (const f of flowers) {
         ctx.save(); ctx.translate(f.x, f.y);
         const pulse = 1 + Math.sin(f.phase*1.7)*0.12;
@@ -572,7 +575,6 @@ function draw() {
         ctx.restore();
     }
 
-    // Падающие звёзды
     for (const star of fallingStars) {
         ctx.save(); ctx.translate(star.x, star.y);
         const s = star.size;
@@ -580,7 +582,6 @@ function draw() {
         ctx.shadowColor = `hsla(${star.hue}, 100%, 70%, 0.6)`;
         ctx.shadowBlur = s * 1.5;
         
-        // Скин звезды
         switch(starSkin) {
             case 'star5':
                 const step = Math.PI/5, rot = Math.PI/2*3;
@@ -634,6 +635,91 @@ function draw() {
                 ctx.fillRect(-s*0.1, -s*0.5, s*0.2, s);
                 ctx.fillRect(-s*0.5, -s*0.5, s*0.2, s);
                 break;
+            case 'triangle':
+                ctx.beginPath();
+                ctx.moveTo(0, -s);
+                ctx.lineTo(s * 0.8, s * 0.6);
+                ctx.lineTo(-s * 0.8, s * 0.6);
+                ctx.closePath();
+                ctx.fill();
+                break;
+            case 'square':
+                ctx.fillRect(-s * 0.8, -s * 0.8, s * 1.6, s * 1.6);
+                break;
+            case 'dog':
+                ctx.beginPath(); ctx.arc(0, 0, s * 0.8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(-s * 0.4, -s * 0.5, s * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(s * 0.4, -s * 0.5, s * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.beginPath(); ctx.arc(0, s * 0.1, s * 0.15, 0, Math.PI); ctx.fill();
+                break;
+            case 'hamster':
+                ctx.beginPath(); ctx.ellipse(0, 0, s * 0.9, s * 0.7, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(-s * 0.25, -s * 0.3, s * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(s * 0.25, -s * 0.3, s * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffb6c1';
+                ctx.beginPath(); ctx.arc(0, s * 0.3, s * 0.12, 0, Math.PI); ctx.fill();
+                break;
+            case 'oval':
+                ctx.beginPath(); ctx.ellipse(0, 0, s * 0.9, s * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+                break;
+            case 'semicircle':
+                ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI); ctx.closePath(); ctx.fill();
+                break;
+            case 'rectangle':
+                ctx.fillRect(-s * 1.1, -s * 0.6, s * 2.2, s * 1.2);
+                break;
+            case 'goldbar':
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(-s * 0.9, -s * 0.5, s * 1.8, s * 1.0);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(-s * 0.7, -s * 0.2, s * 1.4, s * 0.2);
+                break;
+            case 'sunflower':
+                ctx.fillStyle = '#ffaa00';
+                ctx.beginPath(); ctx.arc(0, 0, s * 0.7, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#8B4513';
+                ctx.beginPath(); ctx.arc(0, 0, s * 0.3, 0, Math.PI * 2); ctx.fill();
+                for (let i = 0; i < 8; i++) {
+                    const a = i * Math.PI / 4;
+                    ctx.fillStyle = '#ffdd00';
+                    ctx.beginPath();
+                    ctx.ellipse(Math.cos(a) * s * 0.5, Math.sin(a) * s * 0.5, s * 0.25, s * 0.1, a, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+            case 'egg':
+                ctx.fillStyle = '#fefae0';
+                ctx.beginPath(); ctx.ellipse(0, -s * 0.1, s * 0.6, s * 0.75, 0, 0, Math.PI * 2); ctx.fill();
+                break;
+            case 'chick':
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath(); ctx.arc(0, 0, s * 0.6, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ff9900';
+                ctx.beginPath(); ctx.moveTo(0, -s * 0.5); ctx.lineTo(-s * 0.2, -s * 0.7); ctx.lineTo(s * 0.2, -s * 0.7); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.beginPath(); ctx.arc(-s * 0.15, -s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(s * 0.15, -s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fill();
+                break;
+            case 'leaf':
+                ctx.fillStyle = '#4caf50';
+                ctx.beginPath(); ctx.ellipse(0, 0, s * 0.7, s * 0.35, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#2e7d32';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(-s * 0.6, 0); ctx.lineTo(s * 0.6, 0); ctx.stroke();
+                break;
+            case 'tree':
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath(); ctx.moveTo(0, -s * 0.8); ctx.lineTo(-s * 0.6, 0); ctx.lineTo(s * 0.6, 0); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-s * 0.1, 0, s * 0.2, s * 0.4);
+                break;
+            case 'stick':
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-s * 0.15, -s * 0.7, s * 0.3, s * 1.4);
+                break;
             default:
                 ctx.beginPath();
                 for (let i=0; i<8; i++) {
@@ -645,12 +731,10 @@ function draw() {
         }
         ctx.shadowBlur = 0;
         
-        // Ценность над звездой
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 9px "Segoe UI"';
         ctx.textAlign = 'center';
         
-        // Для double-click звёзд показываем оставшиеся клики
         if (star.type.doubleClick && star.clicksRemaining > 0) {
             ctx.fillText(`${star.value} (${star.clicksRemaining})`, 0, -s-4);
         } else {
@@ -659,14 +743,12 @@ function draw() {
         ctx.restore();
     }
 
-    // Частицы
     for (const p of particles) {
         const alpha = 1 - p.life/p.maxLife;
         ctx.fillStyle = `hsla(${p.hue}, 100%, 80%, ${alpha})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size*alpha, 0, Math.PI*2); ctx.fill();
     }
 
-    // Плавающий текст
     for (const ft of floatingTexts) {
         ctx.globalAlpha = Math.min(1, ft.life/20);
         ctx.fillStyle = ft.color || '#ffd700';
@@ -696,14 +778,12 @@ function saveGame() {
     };
     localStorage.setItem('starGardenSave', JSON.stringify(save));
     
-    // Сохраняем в топ
     const tops = JSON.parse(localStorage.getItem('starGardenTops') || '{"coins":[],"time":[],"caught":[],"seeds":[]}');
     const entry = { name: playerName, value: coins, time: playTime, caught: totalCaught, seeds: seedsPlanted };
     tops.coins.push(entry);
     tops.time.push(entry);
     tops.caught.push(entry);
     tops.seeds.push(entry);
-    // Оставляем топ-10 для каждой категории
     tops.coins.sort((a,b) => b.value - a.value).splice(10);
     tops.time.sort((a,b) => b.time - a.time).splice(10);
     tops.caught.sort((a,b) => b.caught - a.caught).splice(10);
@@ -764,9 +844,23 @@ function renderShop(tab) {
         const allSkins = [
             {id:'star4', name:'✦ Четырёхконечная', cost:300},
             {id:'star5', name:'⭐ Пятиконечная', cost:350},
-            {id:'circle', name:'⚪ Кружок', cost:250},
+            {id:'triangle', name:'🔺 Треугольник', cost:200},
             {id:'diamond', name:'💎 Ромбик', cost:280},
+            {id:'square', name:'🟪 Квадрат', cost:180},
             {id:'cat', name:'🐱 Котик', cost:500},
+            {id:'dog', name:'🐶 Собачка', cost:300},
+            {id:'hamster', name:'🐹 Хомяк', cost:300},
+            {id:'oval', name:'🥚 Овал', cost:190},
+            {id:'semicircle', name:'🌓 Полукруг', cost:170},
+            {id:'rectangle', name:'📏 Прямоугольник', cost:160},
+            {id:'goldbar', name:'💰 Слиток', cost:350},
+            {id:'circle', name:'⚪ Кружок', cost:250},
+            {id:'sunflower', name:'🌻 Подсолнух', cost:400},
+            {id:'egg', name:'🥚 Яйцо', cost:220},
+            {id:'chick', name:'🐤 Цыплёнок', cost:320},
+            {id:'leaf', name:'🍃 Листик', cost:240},
+            {id:'tree', name:'🌳 Дерево', cost:450},
+            {id:'stick', name:'🥢 Палка', cost:180},
             {id:'pixel', name:'👾 Пиксель', cost:400},
             {id:'moon', name:'🌙 Луна', cost:450},
             {id:'bee', name:'🐝 Пчела', cost:380},
@@ -800,7 +894,6 @@ function renderShop(tab) {
     
     c.innerHTML = html;
     
-    // Обработчики временных улучшений (с динамическими ценами)
     setTimeout(() => {
         document.getElementById('buyTempX2')?.addEventListener('click', () => {
             if (coins >= tempPrices.x2) {
@@ -846,7 +939,6 @@ function renderShop(tab) {
             }
         });
         
-        // Постоянные улучшения
         document.getElementById('buyPermMult')?.addEventListener('click', () => {
             const cost = Math.floor(200 * Math.pow(2.0, permMultLvl-1));
             if (coins >= cost && permMultLvl < 20) {
@@ -883,7 +975,6 @@ function renderShop(tab) {
             if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
         });
         
-        // Скины звёзд
         document.querySelectorAll('.buySkin').forEach(b => b.addEventListener('click', () => {
             const skin = b.dataset.skin;
             const cost = parseInt(b.dataset.cost);
@@ -900,7 +991,6 @@ function renderShop(tab) {
             renderShop('starskins');
         }));
         
-        // Скины травы
         document.querySelectorAll('.buyGround').forEach(b => b.addEventListener('click', () => {
             const skin = b.dataset.skin;
             const cost = parseInt(b.dataset.cost);
@@ -970,11 +1060,11 @@ function harvestReady() {
     else if (r < 0.65) gardenReward = { type: 'buff', buff: 'slow' };
     else if (r < 0.85) gardenReward = { type: 'buff', buff: 'magnet' };
     else if (r < 0.99) {
-        const allSkins = ['star4', 'star5', 'circle', 'diamond', 'cat', 'pixel', 'moon', 'bee'];
+        const allSkins = ['star4', 'star5', 'triangle', 'diamond', 'square', 'cat', 'dog', 'hamster', 'oval', 'semicircle', 'rectangle', 'goldbar', 'circle', 'sunflower', 'egg', 'chick', 'leaf', 'tree', 'stick', 'pixel', 'moon', 'bee'];
         const avail = allSkins.filter(s => !ownedStarSkins.includes(s));
         gardenReward = avail.length > 0 ? { type: 'skin', skin: avail[Math.floor(Math.random()*avail.length)] } : { type: 'buff', buff: 'x2' };
     } else {
-        gardenReward = { type: 'skin', skin: 'crown' }; // Корона — 1% шанс
+        gardenReward = { type: 'skin', skin: 'crown' };
     }
     updateGardenUI();
 }
@@ -1051,7 +1141,6 @@ function initShopTabs() {
     });
 }
 
-// Обновление языка интерфейса
 function updateAllTexts() {
     document.getElementById('playBtn').textContent = t('play');
     document.getElementById('shopMenuBtn').textContent = t('shop');
@@ -1070,7 +1159,6 @@ function updateAllTexts() {
     updateUI();
 }
 
-// Языковой переключатель
 document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         currentLang = btn.dataset.lang;
@@ -1080,7 +1168,6 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
     });
 });
 
-// Установка начального языка
 const savedLang = localStorage.getItem('starGardenLang');
 if (savedLang) currentLang = savedLang;
 else {
@@ -1089,7 +1176,6 @@ else {
 }
 document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
 
-// Основные обработчики
 document.getElementById('playBtn').addEventListener('click', () => {
     document.getElementById('mainMenu').style.display = 'none';
     document.getElementById('gameScreen').style.display = 'flex';
@@ -1158,7 +1244,6 @@ document.getElementById('closeTutorial').addEventListener('click', () => {
     document.getElementById('tutorialModal').classList.remove('active');
 });
 
-// Настройки темы, шрифта, неба
 document.getElementById('themeSelect').addEventListener('change', function() {
     document.getElementById('bodyTheme').className = this.value;
     localStorage.setItem('starGardenTheme', this.value);
@@ -1172,7 +1257,6 @@ document.getElementById('skySelect').addEventListener('change', function() {
     localStorage.setItem('starGardenSky', this.value);
 });
 
-// Загрузка сохранённых настроек
 const savedTheme = localStorage.getItem('starGardenTheme');
 if (savedTheme) {
     document.getElementById('bodyTheme').className = savedTheme;
@@ -1189,7 +1273,6 @@ if (savedSky) {
     document.getElementById('skySelect').value = savedSky;
 }
 
-// Канвас события
 canvas.addEventListener('click', e => {
     const pos = getClickPos(e);
     mouseX = pos.x; mouseY = pos.y;
@@ -1213,14 +1296,13 @@ canvas.addEventListener('touchmove', e => {
 }, { passive: false });
 canvas.addEventListener('touchend', () => { mouseX = -100; mouseY = -100; });
 
-// Загрузка игры и запуск
 loadGame();
 updateAllTexts();
 updateUI();
 resizeCanvas();
 gameLoop();
 
-console.log('🌟 Star Garden v2.0 загружен!');
+console.log('🌟 Star Garden v2.0.2 загружен!');
 console.log('🌐 Язык:', currentLang.toUpperCase());
 console.log('💰 Монет:', coins, '| 🌊 Волна:', wave, '| 🌱 Семян:', seeds);
 console.log('🎮 Отправляйтесь в главное меню и нажмите "Играть"!');
