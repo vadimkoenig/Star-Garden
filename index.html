@@ -195,401 +195,716 @@
     <div class="modal-overlay" id="tutorialModal">
         <div class="modal"><h2>📖 Обучение</h2><p id="tutorialText"></p><button class="close-btn" id="closeTutorial">Понятно</button></div>
     </div>
-<script>
-(function() {
-    // ---------- ЯЗЫКИ ----------
-    const LANG = {
-        ru: { play:'🎮 Играть', shop:'🛒 Магазин', garden:'🌱 Сад', stats:'📊 Статистика', settings:'⚙️ Настройки', tutorial:'📖 Обучение', back:'🚪 Меню', coins:'💰', wave:'🌊', seeds:'🌱', buy:'Купить', equip:'Надеть', max:'Макс', close:'Закрыть', temp:'⏳ Временные', perm:'🔮 Улучшения', starskins:'✨ Скины звёзд', groundskins:'🌿 Трава', skies:'🌌 Небо', resetWave:'🔄 Сбросить волну', plant:'Посадить', harvest:'🎁 Собрать', tutorialText:'🌟 Кликай по падающим звёздам.<br>💰 Звёзды дают монеты (1–5000).<br>🌱 Иногда выпадают семена — сажай в Саду.<br>🎁 Урожай даёт баффы или скины.<br>🛒 В магазине: временные усиления, постоянные прокачки, скины звёзд и травы.<br>🔮 Волна растёт, можно сбросить.', totalPlayers:'Всего игроков: ', statCoins:'🏆 Топ по монетам', statTime:'⏱ Топ по времени', statCaught:'⭐ Топ пойманных', statSeeds:'🌱 Топ семян' },
-        en: { play:'🎮 Play', shop:'🛒 Shop', garden:'🌱 Garden', stats:'📊 Stats', settings:'⚙️ Settings', tutorial:'📖 Tutorial', back:'🚪 Menu', coins:'💰', wave:'🌊', seeds:'🌱', buy:'Buy', equip:'Equip', max:'Max', close:'Close', temp:'⏳ Temporary', perm:'🔮 Upgrades', starskins:'✨ Star Skins', groundskins:'🌿 Ground', skies:'🌌 Sky', resetWave:'🔄 Reset Wave', plant:'Plant', harvest:'🎁 Harvest', tutorialText:'🌟 Click falling stars.<br>💰 Stars give coins (1–5000).<br>🌱 Seeds drop sometimes — plant in Garden.<br>🎁 Harvest gives buffs or skins.<br>🛒 Shop: temp boosts, perm upgrades, skins.<br>🔮 Wave grows, can be reset.', totalPlayers:'Total players: ', statCoins:'🏆 Top Coins', statTime:'⏱ Top Time', statCaught:'⭐ Top Caught', statSeeds:'🌱 Top Seeds' }
-    };
 
-    let currentLang = (() => {
-        const saved = localStorage.getItem('starGardenLang');
-        if (saved) return saved;
-        const nav = navigator.language || navigator.userLanguage;
-        return nav.startsWith('ru') ? 'ru' : 'en';
-    })();
-
-    function t(key) { return LANG[currentLang][key] || key; }
-
-    // ---------- ЗВУК ----------
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-    function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
-    function playTone(freq, type, duration, vol = 0.08) {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type; osc.frequency.value = freq;
-        gain.gain.value = vol; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
-    }
-    function sfxCatch() { playTone(600, 'sine', 0.12, 0.1); setTimeout(() => playTone(1000, 'sine', 0.1, 0.08), 80); }
-    function sfxSeed() { playTone(300, 'triangle', 0.15, 0.06); }
-    function sfxHarvest() { playTone(500, 'sine', 0.1, 0.08); setTimeout(() => playTone(800, 'sine', 0.12, 0.1), 100); }
-    function sfxBuy() { playTone(900, 'square', 0.08, 0.04); }
-    function sfxError() { playTone(150, 'sawtooth', 0.2, 0.04); }
-
-    // ---------- КАНВАС ----------
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    let W = 500, H = 520;
-
-    function resizeCanvas() {
-        const maxW = Math.min(window.innerWidth - 10, 700);
-        const ratio = 500 / 520;
-        canvas.style.width = maxW + 'px';
-        canvas.style.height = (maxW / ratio) + 'px';
-        canvas.style.maxWidth = '100%';
-        W = 500; H = 520;
-        canvas.width = W;
-        canvas.height = H;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    function getClickPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: (e.clientX - rect.left) * (W / rect.width),
-            y: (e.clientY - rect.top) * (H / rect.height)
+    <script>
+    (function() {
+        const LANG = {
+            ru: { play:'🎮 Играть', shop:'🛒 Магазин', garden:'🌱 Сад', stats:'📊 Статистика', settings:'⚙️ Настройки', tutorial:'📖 Обучение', back:'🚪 Меню', coins:'💰', wave:'🌊', seeds:'🌱', buy:'Купить', equip:'Надеть', max:'Макс', close:'Закрыть', temp:'⏳ Временные', perm:'🔮 Улучшения', starskins:'✨ Скины звёзд', groundskins:'🌿 Трава', skies:'🌌 Небо', resetWave:'🔄 Сбросить волну', plant:'Посадить', harvest:'🎁 Собрать', tutorialText:'🌟 Кликай по падающим звёздам.<br>💰 Звёзды дают монеты (1–5000).<br>🌱 Иногда выпадают семена — сажай в Саду.<br>🎁 Урожай даёт баффы или скины.<br>🛒 В магазине: временные усиления, постоянные прокачки, скины звёзд и травы.<br>🔮 Волна растёт, можно сбросить.', totalPlayers:'Всего игроков: ', statCoins:'🏆 Топ по монетам', statTime:'⏱ Топ по времени', statCaught:'⭐ Топ пойманных', statSeeds:'🌱 Топ семян' },
+            en: { play:'🎮 Play', shop:'🛒 Shop', garden:'🌱 Garden', stats:'📊 Stats', settings:'⚙️ Settings', tutorial:'📖 Tutorial', back:'🚪 Menu', coins:'💰', wave:'🌊', seeds:'🌱', buy:'Buy', equip:'Equip', max:'Max', close:'Close', temp:'⏳ Temporary', perm:'🔮 Upgrades', starskins:'✨ Star Skins', groundskins:'🌿 Ground', skies:'🌌 Sky', resetWave:'🔄 Reset Wave', plant:'Plant', harvest:'🎁 Harvest', tutorialText:'🌟 Click falling stars.<br>💰 Stars give coins (1–5000).<br>🌱 Seeds drop sometimes — plant in Garden.<br>🎁 Harvest gives buffs or skins.<br>🛒 Shop: temp boosts, perm upgrades, skins.<br>🔮 Wave grows, can be reset.', totalPlayers:'Total players: ', statCoins:'🏆 Top Coins', statTime:'⏱ Top Time', statCaught:'⭐ Top Caught', statSeeds:'🌱 Top Seeds' }
         };
-    }
 
-    // ---------- ИГРОВЫЕ ПЕРЕМЕННЫЕ ----------
-    const GROUND_Y = H * 0.78;
-    let flowers = [], fallingStars = [], particles = [], floatingTexts = [];
-    let totalCaught = 0, wave = 1, coins = 0, seeds = 0;
-    let frameCount = 0, mouseX = -100, mouseY = -100, gameRunning = false;
+        let currentLang = (() => {
+            const saved = localStorage.getItem('starGardenLang');
+            if (saved) return saved;
+            const nav = navigator.language || navigator.userLanguage;
+            return nav.startsWith('ru') ? 'ru' : 'en';
+        })();
 
-    let permMultLvl = 1, luckLvl = 0, slowPermLvl = 0, catchRadiusLvl = 0, starSizeLvl = 0, autoCollectLvl = 0, seedCapLvl = 1, autoPlantLvl = 0;
-    let tempPrices = { x2: 100, slow: 80, magnet: 60, collectAll: 150 };
-    let tempCounts = { x2: 0, slow: 0, magnet: 0, collectAll: 0 };
-    let tempMult = 1, tempMultTimer = 0, slowMotion = false, slowTimer = 0, magnetActive = false, magnetTimer = 0;
+        function t(key) { return LANG[currentLang][key] || key; }
 
-    let starSkin = 'default', ownedStarSkins = ['default'];
-    let groundSkin = 'green', ownedGroundSkins = ['green'];
-    let skySkin = 'default';
-
-    let gardenGrowing = false, gardenTimer = 0, gardenReward = null, autoPlantTimer = 0;
-    let starCaughtCounts = {}, seedsPlanted = 0, playTime = 0, lastTime = Date.now();
-    const playerName = 'Player' + Math.floor(Math.random() * 1000);
-    const MAX_FLOWERS = 75, BASE_SEED_CAP = 100;
-
-    const starTypes = [
-        { id: 'yellow',  hue: 50,  size: 9,  speed: 1.0, value: 1,    weight: 24, seedChance: 0.008, doubleClick: false },
-        { id: 'green',   hue: 120, size: 8,  speed: 1.4, value: 10,   weight: 18, seedChance: 0.15,  doubleClick: false },
-        { id: 'blue',    hue: 210, size: 8,  speed: 1.1, value: 5,    weight: 22, seedChance: 0.08,  doubleClick: false },
-        { id: 'purple',  hue: 280, size: 8,  speed: 1.2, value: 25,   weight: 14, seedChance: 0.06,  doubleClick: false },
-        { id: 'maroon',  hue: 340, size: 10, speed: 2.0, value: 50,   weight: 5,  seedChance: 0.04,  doubleClick: false },
-        { id: 'black',   hue: 0,   size: 12, speed: 3.8, value: 100,  weight: 4,  seedChance: 0.20,  doubleClick: false },
-        { id: 'gold',    hue: 45,  size: 11, speed: 4.5, value: 1000, weight: 0.3, seedChance: 0.70, doubleClick: false },
-        { id: 'cyan',    hue: 180, size: 9,  speed: 3.2, value: 500,  weight: 2,  seedChance: 0.40, doubleClick: false },
-        { id: 'rainbow', hue: -1,  size: 5,  speed: 5.5, value: 5000, weight: 0.1, seedChance: 0.90, doubleClick: false },
-        { id: 'double',  hue: 300, size: 10, speed: 2.5, value: 300,  weight: 1.5, seedChance: 0.60, doubleClick: true, clicksNeeded: 2 },
-        { id: 'pixel',   hue: 200, size: 7,  speed: 2.0, value: 200,  weight: 2,   seedChance: 0.25, doubleClick: false }
-    ];
-
-    function getMaxSeeds() { return Math.min(500, BASE_SEED_CAP + (seedCapLvl - 1) * 40); }
-    function random(min, max) { return Math.random() * (max - min) + min; }
-    function randomInt(min, max) { return Math.floor(random(min, max + 1)); }
-    function dist(x1, y1, x2, y2) { return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); }
-
-    function getStarType() {
-        let total = starTypes.reduce((s, t) => s + t.weight, 0);
-        let r = Math.random() * total;
-        const luckBoost = luckLvl * 0.03;
-        for (const t of starTypes) {
-            let w = t.weight;
-            if (['gold','rainbow','cyan','double','pixel'].includes(t.id)) w *= (1 + luckBoost);
-            if ((r -= w) <= 0) return t;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+        function playTone(freq, type, duration, vol = 0.08) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            gain.gain.value = vol; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
-        return starTypes[0];
-    }
+        function sfxCatch() { playTone(600, 'sine', 0.12, 0.1); setTimeout(() => playTone(1000, 'sine', 0.1, 0.08), 80); }
+        function sfxSeed() { playTone(300, 'triangle', 0.15, 0.06); }
+        function sfxHarvest() { playTone(500, 'sine', 0.1, 0.08); setTimeout(() => playTone(800, 'sine', 0.12, 0.1), 100); }
+        function sfxBuy() { playTone(900, 'square', 0.08, 0.04); }
+        function sfxError() { playTone(150, 'sawtooth', 0.2, 0.04); }
 
-    function spawnStar() {
-        const type = getStarType();
-        const sizeMult = 1 + starSizeLvl * 0.085;
-        let speed = random(type.speed * 0.9, type.speed * 1.3);
-        if (slowMotion) speed *= 0.4;
-        speed *= (1 - slowPermLvl * 0.04);
-        fallingStars.push({
-            x: random(20, W - 20), y: random(-40, -10), speed,
-            size: type.size * sizeMult,
-            hue: type.hue === -1 ? frameCount % 360 : type.hue,
-            value: type.value, type, twinkle: random(0, Math.PI * 2),
-            clicksRemaining: type.doubleClick ? type.clicksNeeded : 0
-        });
-    }
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let W = 500, H = 520;
 
-    function catchStar(star) {
-        let value = Math.floor(star.value * (1 + (permMultLvl - 1) * 0.45) * tempMult);
-        coins += value; totalCaught++;
-        starCaughtCounts[star.type.id] = (starCaughtCounts[star.type.id] || 0) + 1;
-        sfxCatch(); burstParticles(star.x, star.y, star.hue);
-        plantFlower(star.x, star.hue);
-        floatingTexts.push({ x: star.x, y: star.y, text: `+${value}`, life: 45, color: '#ffd700' });
-        const idx = fallingStars.indexOf(star);
-        if (idx >= 0) fallingStars.splice(idx, 1);
-        if (Math.random() < star.type.seedChance && seeds < getMaxSeeds()) {
-            seeds++; sfxSeed();
-            floatingTexts.push({ x: star.x + 10, y: star.y - 10, text: '🌱', life: 35, color: '#aaffaa' });
+        function resizeCanvas() {
+            const maxW = Math.min(window.innerWidth - 20, 700);
+            const ratio = 500 / 520;
+            canvas.style.width = maxW + 'px';
+            canvas.style.height = (maxW / ratio) + 'px';
+            canvas.style.maxWidth = '100%';
+            W = 500; H = 520;
+            canvas.width = W; canvas.height = H;
         }
-        if (totalCaught % 20 === 0) wave++;
-        updateUI();
-    }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-    function plantFlower(starX, starHue) {
-        if (flowers.length >= MAX_FLOWERS) flowers.shift();
-        flowers.push({ x: Math.max(15, Math.min(W - 15, starX)), y: GROUND_Y + random(-2, 10), size: random(10, 22), hue: (starHue + random(-20, 20)) % 360, phase: random(0, Math.PI * 2), petalCount: randomInt(5, 9) });
-    }
-
-    function burstParticles(x, y, hue) {
-        for (let i = 0; i < 14; i++) {
-            const angle = random(0, Math.PI * 2), speed = random(1.5, 5);
-            particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - random(1, 3), life: 0, maxLife: random(20, 40), hue: hue === 0 ? 0 : (hue + random(-15, 15)), size: random(1.5, 4) });
+        function getClickPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left) * (W / rect.width),
+                y: (e.clientY - rect.top) * (H / rect.height)
+            };
         }
-    }
 
-    function handleClick(cx, cy) {
-        if (!gameRunning) return;
-        initAudio();
-        const radius = 28 + catchRadiusLvl * 2.5;
-        for (let i = fallingStars.length - 1; i >= 0; i--) {
-            const star = fallingStars[i];
-            if (dist(cx, cy, star.x, star.y) < radius) {
-                if (star.type.doubleClick && star.clicksRemaining > 1) {
-                    star.clicksRemaining--;
-                    floatingTexts.push({ x: star.x, y: star.y - 15, text: `${star.clicksRemaining}`, life: 25, color: '#ffffff' });
-                    sfxError();
+        const GROUND_Y = H * 0.78;
+        let flowers = [], fallingStars = [], particles = [], floatingTexts = [];
+        let totalCaught = 0, wave = 1, coins = 0, seeds = 0;
+        let frameCount = 0, mouseX = -100, mouseY = -100, gameRunning = false;
+
+        let permMultLvl = 1, luckLvl = 0, slowPermLvl = 0, catchRadiusLvl = 0, starSizeLvl = 0, autoCollectLvl = 0, seedCapLvl = 1, autoPlantLvl = 0;
+        let tempPrices = { x2: 100, slow: 80, magnet: 60, collectAll: 150 };
+        let tempCounts = { x2: 0, slow: 0, magnet: 0, collectAll: 0 };
+        let tempMult = 1, tempMultTimer = 0, slowMotion = false, slowTimer = 0, magnetActive = false, magnetTimer = 0;
+
+        let starSkin = 'default', ownedStarSkins = ['default'];
+        let groundSkin = 'green', ownedGroundSkins = ['green'];
+        let skySkin = 'default';
+
+        let gardenGrowing = false, gardenTimer = 0, gardenReward = null, autoPlantTimer = 0;
+        let starCaughtCounts = {}, seedsPlanted = 0, playTime = 0, lastTime = Date.now();
+        const playerName = 'Player' + Math.floor(Math.random() * 1000);
+        const MAX_FLOWERS = 75, BASE_SEED_CAP = 100;
+
+        const starTypes = [
+            { id: 'yellow',  hue: 50,  size: 9,  speed: 1.0, value: 1,    weight: 24, seedChance: 0.008, doubleClick: false },
+            { id: 'green',   hue: 120, size: 8,  speed: 1.4, value: 10,   weight: 18, seedChance: 0.15,  doubleClick: false },
+            { id: 'blue',    hue: 210, size: 8,  speed: 1.1, value: 5,    weight: 22, seedChance: 0.08,  doubleClick: false },
+            { id: 'purple',  hue: 280, size: 8,  speed: 1.2, value: 25,   weight: 14, seedChance: 0.06,  doubleClick: false },
+            { id: 'maroon',  hue: 340, size: 10, speed: 2.0, value: 50,   weight: 5,  seedChance: 0.04,  doubleClick: false },
+            { id: 'black',   hue: 0,   size: 12, speed: 3.8, value: 100,  weight: 4,  seedChance: 0.20,  doubleClick: false },
+            { id: 'gold',    hue: 45,  size: 11, speed: 4.5, value: 1000, weight: 0.3, seedChance: 0.70, doubleClick: false },
+            { id: 'cyan',    hue: 180, size: 9,  speed: 3.2, value: 500,  weight: 2,  seedChance: 0.40, doubleClick: false },
+            { id: 'rainbow', hue: -1,  size: 5,  speed: 5.5, value: 5000, weight: 0.1, seedChance: 0.90, doubleClick: false },
+            { id: 'double',  hue: 300, size: 10, speed: 2.5, value: 300,  weight: 1.5, seedChance: 0.60, doubleClick: true, clicksNeeded: 2 },
+            { id: 'pixel',   hue: 200, size: 7,  speed: 2.0, value: 200,  weight: 2,   seedChance: 0.25, doubleClick: false }
+        ];
+
+        function getMaxSeeds() { return Math.min(500, BASE_SEED_CAP + (seedCapLvl - 1) * 40); }
+        function random(min, max) { return Math.random() * (max - min) + min; }
+        function randomInt(min, max) { return Math.floor(random(min, max + 1)); }
+        function dist(x1, y1, x2, y2) { return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); }
+
+        function getStarType() {
+            let total = starTypes.reduce((s, t) => s + t.weight, 0);
+            let r = Math.random() * total;
+            const luckBoost = luckLvl * 0.03;
+            for (const t of starTypes) {
+                let w = t.weight;
+                if (['gold','rainbow','cyan','double','pixel'].includes(t.id)) w *= (1 + luckBoost);
+                if ((r -= w) <= 0) return t;
+            }
+            return starTypes[0];
+        }
+
+        function spawnStar() {
+            const type = getStarType();
+            const sizeMult = 1 + starSizeLvl * 0.085;
+            let speed = random(type.speed * 0.9, type.speed * 1.3);
+            if (slowMotion) speed *= 0.4;
+            speed *= (1 - slowPermLvl * 0.04);
+            fallingStars.push({
+                x: random(20, W - 20), y: random(-40, -10), speed,
+                size: type.size * sizeMult,
+                hue: type.hue === -1 ? frameCount % 360 : type.hue,
+                value: type.value, type, twinkle: random(0, Math.PI * 2),
+                clicksRemaining: type.doubleClick ? type.clicksNeeded : 0
+            });
+        }
+
+        function catchStar(star) {
+            let value = Math.floor(star.value * (1 + (permMultLvl - 1) * 0.45) * tempMult);
+            coins += value; totalCaught++;
+            starCaughtCounts[star.type.id] = (starCaughtCounts[star.type.id] || 0) + 1;
+            sfxCatch(); burstParticles(star.x, star.y, star.hue);
+            plantFlower(star.x, star.hue);
+            floatingTexts.push({ x: star.x, y: star.y, text: `+${value}`, life: 45, color: '#ffd700' });
+            const idx = fallingStars.indexOf(star);
+            if (idx >= 0) fallingStars.splice(idx, 1);
+            if (Math.random() < star.type.seedChance && seeds < getMaxSeeds()) {
+                seeds++; sfxSeed();
+                floatingTexts.push({ x: star.x + 10, y: star.y - 10, text: '🌱', life: 35, color: '#aaffaa' });
+            }
+            if (totalCaught % 20 === 0) wave++;
+            updateUI();
+        }
+
+        function plantFlower(starX, starHue) {
+            if (flowers.length >= MAX_FLOWERS) flowers.shift();
+            flowers.push({ x: Math.max(15, Math.min(W - 15, starX)), y: GROUND_Y + random(-2, 10), size: random(10, 22), hue: (starHue + random(-20, 20)) % 360, phase: random(0, Math.PI * 2), petalCount: randomInt(5, 9) });
+        }
+
+        function burstParticles(x, y, hue) {
+            for (let i = 0; i < 14; i++) {
+                const angle = random(0, Math.PI * 2), speed = random(1.5, 5);
+                particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - random(1, 3), life: 0, maxLife: random(20, 40), hue: hue === 0 ? 0 : (hue + random(-15, 15)), size: random(1.5, 4) });
+            }
+        }
+
+        function handleClick(cx, cy) {
+            if (!gameRunning) return;
+            initAudio();
+            const radius = 28 + catchRadiusLvl * 2.5;
+            for (let i = fallingStars.length - 1; i >= 0; i--) {
+                const star = fallingStars[i];
+                if (dist(cx, cy, star.x, star.y) < radius) {
+                    if (star.type.doubleClick && star.clicksRemaining > 1) {
+                        star.clicksRemaining--;
+                        floatingTexts.push({ x: star.x, y: star.y - 15, text: `${star.clicksRemaining}`, life: 25, color: '#ffffff' });
+                        sfxError();
+                        return;
+                    }
+                    catchStar(star);
                     return;
                 }
-                catchStar(star);
-                return;
             }
-        }
-        sfxError();
-    }
-
-    function update() {
-        if (!gameRunning) return;
-        frameCount++;
-        const now = Date.now();
-        if (now - lastTime >= 1000) { playTime++; lastTime = now; }
-
-        if (tempMultTimer > 0 && --tempMultTimer <= 0) tempMult = 1;
-        if (slowTimer > 0 && --slowTimer <= 0) slowMotion = false;
-        if (magnetTimer > 0 && --magnetTimer <= 0) magnetActive = false;
-
-        if (gardenGrowing && --gardenTimer <= 0) { gardenGrowing = false; harvestReady(); updateGardenUI(); }
-
-        if (autoPlantLvl > 0 && !gardenGrowing && !gardenReward && seeds > 0) {
-            autoPlantTimer++;
-            const interval = Math.max(30, 1200 - autoPlantLvl * 55);
-            if (autoPlantTimer >= interval) { autoPlantTimer = 0; seeds--; seedsPlanted++; gardenGrowing = true; gardenTimer = 7200; updateUI(); updateGardenUI(); }
+            sfxError();
         }
 
-        if (frameCount % Math.max(14, 45 - wave * 1.2) === 0) spawnStar();
+        function update() {
+            if (!gameRunning) return;
+            frameCount++;
+            const now = Date.now();
+            if (now - lastTime >= 1000) { playTime++; lastTime = now; }
 
-        for (let i = fallingStars.length - 1; i >= 0; i--) {
-            const s = fallingStars[i];
-            if (magnetActive && dist(mouseX, mouseY, s.x, s.y) < 150) {
-                const angle = Math.atan2(mouseY - s.y, mouseX - s.x);
-                s.x += Math.cos(angle) * 2.5; s.y += Math.sin(angle) * 2.5;
+            if (tempMultTimer > 0 && --tempMultTimer <= 0) tempMult = 1;
+            if (slowTimer > 0 && --slowTimer <= 0) slowMotion = false;
+            if (magnetTimer > 0 && --magnetTimer <= 0) magnetActive = false;
+
+            if (gardenGrowing && --gardenTimer <= 0) { gardenGrowing = false; harvestReady(); updateGardenUI(); }
+
+            if (autoPlantLvl > 0 && !gardenGrowing && !gardenReward && seeds > 0) {
+                autoPlantTimer++;
+                const interval = Math.max(30, 1200 - autoPlantLvl * 55);
+                if (autoPlantTimer >= interval) {
+                    autoPlantTimer = 0; seeds--; seedsPlanted++;
+                    gardenGrowing = true; gardenTimer = 7200;
+                    updateUI(); updateGardenUI();
+                }
             }
-            s.y += s.speed; s.twinkle += 0.08;
-            if (s.y > GROUND_Y - 5) fallingStars.splice(i, 1);
-        }
 
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life++;
-            if (p.life >= p.maxLife) particles.splice(i, 1);
-        }
+            if (frameCount % Math.max(14, 45 - wave * 1.2) === 0) spawnStar();
 
-        for (let i = floatingTexts.length - 1; i >= 0; i--) {
-            floatingTexts[i].y -= 0.7; floatingTexts[i].life--;
-            if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
-        }
-
-        for (const f of flowers) f.phase += 0.03;
-
-        if (autoCollectLvl > 0 && fallingStars.length > 0) {
-            const interval = Math.max(30, 200 - autoCollectLvl * 35);
-            if (frameCount % interval === 0) {
-                const target = fallingStars.reduce((a, b) => a.y > b.y ? a : b);
-                if (target) catchStar(target);
+            for (let i = fallingStars.length - 1; i >= 0; i--) {
+                const s = fallingStars[i];
+                if (magnetActive && dist(mouseX, mouseY, s.x, s.y) < 150) {
+                    const angle = Math.atan2(mouseY - s.y, mouseX - s.x);
+                    s.x += Math.cos(angle) * 2.5; s.y += Math.sin(angle) * 2.5;
+                }
+                s.y += s.speed; s.twinkle += 0.08;
+                if (s.y > GROUND_Y - 5) fallingStars.splice(i, 1);
             }
-        }
 
-        updateUI(); saveGame();
-    }
-
-    function updateUI() {
-        document.getElementById('coinDisplay').textContent = `💰 ${coins}`;
-        document.getElementById('waveDisplay').textContent = `🌊 ${wave}`;
-        document.getElementById('seedDisplay').textContent = `🌱 ${seeds}`;
-    }
-
-    const skyGradients = {
-        default: ['#05051a','#0d0d2b','#111838'],
-        night: ['#000011','#000022','#0a0a2a'],
-        aurora: ['#0a1a2a','#0a2a1a','#1a2a3a'],
-        sunset: ['#2a0a0a','#3a1a0a','#1a0a0a']
-    };
-
-    function draw() {
-        ctx.clearRect(0,0,W,H);
-        const skyCols = skyGradients[skySkin] || skyGradients.default;
-        const skyGrad = ctx.createLinearGradient(0,0,0,GROUND_Y);
-        skyGrad.addColorStop(0,skyCols[0]); skyGrad.addColorStop(0.6,skyCols[1]); skyGrad.addColorStop(1,skyCols[2]);
-        ctx.fillStyle = skyGrad; ctx.fillRect(0,0,W,GROUND_Y);
-
-        if (!draw._stars) { draw._stars = []; for (let i=0;i<60;i++) draw._stars.push({x:random(0,W),y:random(0,GROUND_Y*0.85),size:random(0.5,2.2),b:random(0.2,0.7),f:random(0.01,0.04),p:random(0,Math.PI*2)}); }
-        for (const s of draw._stars) { const a=s.b+Math.sin(frameCount*s.f+s.p)*0.25; ctx.fillStyle=`rgba(220,220,255,${Math.max(0.05,a)})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill(); }
-
-        ctx.save(); ctx.translate(W*0.85,GROUND_Y*0.25); ctx.fillStyle='#fffde8'; ctx.beginPath(); ctx.arc(0,0,25,0,Math.PI*2); ctx.fill(); ctx.fillStyle=skyCols[0]; ctx.beginPath(); ctx.arc(10,-4,20,0,Math.PI*2); ctx.fill(); ctx.restore();
-
-        const groundColors = { green:'#1a2e1a', pink:'#2e1a2a', gold:'#2e2a1a', snow:'#c8d8e0', lava:'#3a1a0a', night:'#0a0a14' };
-        ctx.fillStyle = groundColors[groundSkin] || groundColors.green; ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
-
-        for (const f of flowers) {
-            ctx.save(); ctx.translate(f.x,f.y); const pulse=1+Math.sin(f.phase*1.7)*0.12, sz=f.size*pulse;
-            ctx.fillStyle=`hsla(${f.hue},80%,65%,0.9)`;
-            for (let i=0;i<f.petalCount;i++) { const angle=(i/f.petalCount)*Math.PI*2+f.phase*0.3; ctx.save(); ctx.rotate(angle); ctx.beginPath(); ctx.ellipse(sz*0.35,0,sz*0.35,sz*0.25,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
-            ctx.fillStyle='#ffffcc'; ctx.beginPath(); ctx.arc(0,0,sz*0.2,0,Math.PI*2); ctx.fill(); ctx.restore();
-        }
-
-        for (const star of fallingStars) {
-            ctx.save(); ctx.translate(star.x,star.y); const s=star.size;
-            ctx.fillStyle=`hsla(${star.hue},100%,80%,0.9)`; ctx.shadowColor=`hsla(${star.hue},100%,70%,0.6)`; ctx.shadowBlur=s*1.5;
-            switch(starSkin){
-                case'star5':{const step=Math.PI/5;let rot=Math.PI/2*3;ctx.beginPath();for(let i=0;i<5;i++){ctx.lineTo(Math.cos(rot)*s,Math.sin(rot)*s);rot+=step;ctx.lineTo(Math.cos(rot)*s*0.5,Math.sin(rot)*s*0.5);rot+=step;}ctx.closePath();ctx.fill();break;}
-                case'star4':ctx.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,r=i%2===0?s:s*0.4;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();ctx.fill();break;
-                case'circle':ctx.beginPath();ctx.arc(0,0,s*0.9,0,Math.PI*2);ctx.fill();break;
-                case'diamond':ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s,0);ctx.lineTo(0,s);ctx.lineTo(-s,0);ctx.closePath();ctx.fill();break;
-                case'cat':ctx.beginPath();ctx.arc(0,0,s*0.8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-s*0.3,-s*0.4,s*0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(s*0.3,-s*0.4,s*0.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffaaaa';ctx.beginPath();ctx.arc(0,s*0.2,s*0.1,0,Math.PI);ctx.fill();break;
-                case'pixel':{const ps=s*0.7;ctx.fillRect(-ps,-ps,ps*2,ps*2);ctx.fillStyle='#fff';ctx.fillRect(-ps*0.3,-ps*0.3,ps*0.6,ps*0.6);break;}
-                case'moon':ctx.beginPath();ctx.arc(0,0,s,0,Math.PI*2);ctx.fill();ctx.fillStyle=skyCols[0];ctx.beginPath();ctx.arc(s*0.3,-s*0.2,s*0.8,0,Math.PI*2);ctx.fill();break;
-                case'bee':ctx.fillStyle='#ffdd00';ctx.beginPath();ctx.ellipse(0,0,s*0.8,s*0.5,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.fillRect(-s*0.1,-s*0.5,s*0.2,s);ctx.fillRect(-s*0.5,-s*0.5,s*0.2,s);break;
-                case'triangle':ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s*0.8,s*0.6);ctx.lineTo(-s*0.8,s*0.6);ctx.closePath();ctx.fill();break;
-                case'square':ctx.fillRect(-s*0.8,-s*0.8,s*1.6,s*1.6);break;
-                case'dog':ctx.beginPath();ctx.arc(0,0,s*0.8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-s*0.4,-s*0.5,s*0.15,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(s*0.4,-s*0.5,s*0.15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(0,s*0.1,s*0.15,0,Math.PI);ctx.fill();break;
-                case'hamster':ctx.beginPath();ctx.ellipse(0,0,s*0.9,s*0.7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-s*0.25,-s*0.3,s*0.15,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(s*0.25,-s*0.3,s*0.15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffb6c1';ctx.beginPath();ctx.arc(0,s*0.3,s*0.12,0,Math.PI);ctx.fill();break;
-                case'oval':ctx.beginPath();ctx.ellipse(0,0,s*0.9,s*0.5,0,0,Math.PI*2);ctx.fill();break;
-                case'semicircle':ctx.beginPath();ctx.arc(0,0,s,0,Math.PI);ctx.closePath();ctx.fill();break;
-                case'rectangle':ctx.fillRect(-s*1.1,-s*0.6,s*2.2,s*1.2);break;
-                case'goldbar':ctx.fillStyle='#ffd700';ctx.fillRect(-s*0.9,-s*0.5,s*1.8,s*1.0);ctx.fillStyle='#fff';ctx.fillRect(-s*0.7,-s*0.2,s*1.4,s*0.2);break;
-                case'sunflower':ctx.fillStyle='#ffaa00';ctx.beginPath();ctx.arc(0,0,s*0.7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#8B4513';ctx.beginPath();ctx.arc(0,0,s*0.3,0,Math.PI*2);ctx.fill();for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.fillStyle='#ffdd00';ctx.beginPath();ctx.ellipse(Math.cos(a)*s*0.5,Math.sin(a)*s*0.5,s*0.25,s*0.1,a,0,Math.PI*2);ctx.fill();}break;
-                case'egg':ctx.fillStyle='#fefae0';ctx.beginPath();ctx.ellipse(0,-s*0.1,s*0.6,s*0.75,0,0,Math.PI*2);ctx.fill();break;
-                case'chick':ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(0,0,s*0.6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff9900';ctx.beginPath();ctx.moveTo(0,-s*0.5);ctx.lineTo(-s*0.2,-s*0.7);ctx.lineTo(s*0.2,-s*0.7);ctx.closePath();ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-s*0.15,-s*0.1,s*0.08,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(s*0.15,-s*0.1,s*0.08,0,Math.PI*2);ctx.fill();break;
-                case'leaf':ctx.fillStyle='#4caf50';ctx.beginPath();ctx.ellipse(0,0,s*0.7,s*0.35,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#2e7d32';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-s*0.6,0);ctx.lineTo(s*0.6,0);ctx.stroke();break;
-                case'tree':ctx.fillStyle='#228B22';ctx.beginPath();ctx.moveTo(0,-s*0.8);ctx.lineTo(-s*0.6,0);ctx.lineTo(s*0.6,0);ctx.closePath();ctx.fill();ctx.fillStyle='#8B4513';ctx.fillRect(-s*0.1,0,s*0.2,s*0.4);break;
-                case'stick':ctx.fillStyle='#8B4513';ctx.fillRect(-s*0.15,-s*0.7,s*0.3,s*1.4);break;
-                default:ctx.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,r=i%2===0?s:s*0.4;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();ctx.fill();
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life++;
+                if (p.life >= p.maxLife) particles.splice(i, 1);
             }
-            ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font='bold 9px "Segoe UI"'; ctx.textAlign='center';
-            if(star.type.doubleClick&&star.clicksRemaining>0)ctx.fillText(`${star.value} (${star.clicksRemaining})`,0,-s-4);
-            else ctx.fillText(star.value,0,-s-4);
+
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                floatingTexts[i].y -= 0.7; floatingTexts[i].life--;
+                if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            for (const f of flowers) f.phase += 0.03;
+
+            if (autoCollectLvl > 0 && fallingStars.length > 0) {
+                const interval = Math.max(30, 200 - autoCollectLvl * 35);
+                if (frameCount % interval === 0) {
+                    const target = fallingStars.reduce((a, b) => a.y > b.y ? a : b);
+                    if (target) catchStar(target);
+                }
+            }
+
+            updateUI(); saveGame();
+        }
+
+        function updateUI() {
+            document.getElementById('coinDisplay').textContent = `💰 ${coins}`;
+            document.getElementById('waveDisplay').textContent = `🌊 ${wave}`;
+            document.getElementById('seedDisplay').textContent = `🌱 ${seeds}`;
+        }
+
+        const skyGradients = {
+            default: ['#05051a','#0d0d2b','#111838'],
+            night: ['#000011','#000022','#0a0a2a'],
+            aurora: ['#0a1a2a','#0a2a1a','#1a2a3a'],
+            sunset: ['#2a0a0a','#3a1a0a','#1a0a0a']
+        };
+
+        function draw() {
+            ctx.clearRect(0,0,W,H);
+            const skyCols = skyGradients[skySkin] || skyGradients.default;
+            const skyGrad = ctx.createLinearGradient(0,0,0,GROUND_Y);
+            skyGrad.addColorStop(0,skyCols[0]); skyGrad.addColorStop(0.6,skyCols[1]); skyGrad.addColorStop(1,skyCols[2]);
+            ctx.fillStyle = skyGrad; ctx.fillRect(0,0,W,GROUND_Y);
+
+            if (!draw._stars) {
+                draw._stars = [];
+                for (let i = 0; i < 60; i++) draw._stars.push({ x: random(0,W), y: random(0,GROUND_Y * 0.85), size: random(0.5,2.2), b: random(0.2,0.7), f: random(0.01,0.04), p: random(0,Math.PI*2) });
+            }
+            for (const s of draw._stars) {
+                const a = s.b + Math.sin(frameCount*s.f+s.p)*0.25;
+                ctx.fillStyle = `rgba(220,220,255,${Math.max(0.05, a)})`;
+                ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+            }
+
+            ctx.save(); ctx.translate(W*0.85, GROUND_Y*0.25);
+            ctx.fillStyle = '#fffde8'; ctx.beginPath(); ctx.arc(0,0,25,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle = skyCols[0]; ctx.beginPath(); ctx.arc(10,-4,20,0,Math.PI*2); ctx.fill();
             ctx.restore();
+
+            const groundColors = { green:'#1a2e1a', pink:'#2e1a2a', gold:'#2e2a1a', snow:'#c8d8e0', lava:'#3a1a0a', night:'#0a0a14' };
+            ctx.fillStyle = groundColors[groundSkin] || groundColors.green;
+            ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
+
+            for (const f of flowers) {
+                ctx.save(); ctx.translate(f.x, f.y);
+                const pulse = 1 + Math.sin(f.phase*1.7)*0.12, sz = f.size * pulse;
+                ctx.fillStyle = `hsla(${f.hue},80%,65%,0.9)`;
+                for (let i = 0; i < f.petalCount; i++) {
+                    const angle = (i/f.petalCount)*Math.PI*2 + f.phase*0.3;
+                    ctx.save(); ctx.rotate(angle);
+                    ctx.beginPath(); ctx.ellipse(sz*0.35,0,sz*0.35,sz*0.25,0,0,Math.PI*2); ctx.fill();
+                    ctx.restore();
+                }
+                ctx.fillStyle = '#ffffcc'; ctx.beginPath(); ctx.arc(0,0,sz*0.2,0,Math.PI*2); ctx.fill();
+                ctx.restore();
+            }
+
+            for (const star of fallingStars) {
+                ctx.save(); ctx.translate(star.x, star.y);
+                const s = star.size;
+                ctx.fillStyle = `hsla(${star.hue},100%,80%,0.9)`;
+                ctx.shadowColor = `hsla(${star.hue},100%,70%,0.6)`;
+                ctx.shadowBlur = s * 1.5;
+
+                switch (starSkin) {
+                    case 'star5':
+                        const step = Math.PI / 5; let rot = Math.PI/2*3;
+                        ctx.beginPath();
+                        for (let i = 0; i < 5; i++) { ctx.lineTo(Math.cos(rot)*s, Math.sin(rot)*s); rot += step; ctx.lineTo(Math.cos(rot)*s*0.5, Math.sin(rot)*s*0.5); rot += step; }
+                        ctx.closePath(); ctx.fill(); break;
+                    case 'star4':
+                        ctx.beginPath();
+                        for (let i = 0; i < 8; i++) { const a = i*Math.PI/4, r = i%2===0?s:s*0.4; ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r); }
+                        ctx.closePath(); ctx.fill(); break;
+                    case 'circle': ctx.beginPath(); ctx.arc(0,0,s*0.9,0,Math.PI*2); ctx.fill(); break;
+                    case 'diamond': ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(s,0); ctx.lineTo(0,s); ctx.lineTo(-s,0); ctx.closePath(); ctx.fill(); break;
+                    case 'cat':
+                        ctx.beginPath(); ctx.arc(0,0,s*0.8,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-s*0.3,-s*0.4,s*0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.3,-s*0.4,s*0.2,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#ffaaaa'; ctx.beginPath(); ctx.arc(0,s*0.2,s*0.1,0,Math.PI); ctx.fill(); break;
+                    case 'pixel': {
+                        const ps = s*0.7; ctx.fillRect(-ps,-ps,ps*2,ps*2);
+                        ctx.fillStyle = '#fff'; ctx.fillRect(-ps*0.3,-ps*0.3,ps*0.6,ps*0.6); break;
+                    }
+                    case 'moon': ctx.beginPath(); ctx.arc(0,0,s,0,Math.PI*2); ctx.fill(); ctx.fillStyle = skyCols[0]; ctx.beginPath(); ctx.arc(s*0.3,-s*0.2,s*0.8,0,Math.PI*2); ctx.fill(); break;
+                    case 'bee': ctx.fillStyle = '#ffdd00'; ctx.beginPath(); ctx.ellipse(0,0,s*0.8,s*0.5,0,0,Math.PI*2); ctx.fill(); ctx.fillStyle = '#000'; ctx.fillRect(-s*0.1,-s*0.5,s*0.2,s); ctx.fillRect(-s*0.5,-s*0.5,s*0.2,s); break;
+                    case 'triangle': ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(s*0.8,s*0.6); ctx.lineTo(-s*0.8,s*0.6); ctx.closePath(); ctx.fill(); break;
+                    case 'square': ctx.fillRect(-s*0.8,-s*0.8,s*1.6,s*1.6); break;
+                    case 'dog':
+                        ctx.beginPath(); ctx.arc(0,0,s*0.8,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-s*0.4,-s*0.5,s*0.15,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.4,-s*0.5,s*0.15,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(0,s*0.1,s*0.15,0,Math.PI); ctx.fill(); break;
+                    case 'hamster':
+                        ctx.beginPath(); ctx.ellipse(0,0,s*0.9,s*0.7,0,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-s*0.25,-s*0.3,s*0.15,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.25,-s*0.3,s*0.15,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#ffb6c1'; ctx.beginPath(); ctx.arc(0,s*0.3,s*0.12,0,Math.PI); ctx.fill(); break;
+                    case 'oval': ctx.beginPath(); ctx.ellipse(0,0,s*0.9,s*0.5,0,0,Math.PI*2); ctx.fill(); break;
+                    case 'semicircle': ctx.beginPath(); ctx.arc(0,0,s,0,Math.PI); ctx.closePath(); ctx.fill(); break;
+                    case 'rectangle': ctx.fillRect(-s*1.1,-s*0.6,s*2.2,s*1.2); break;
+                    case 'goldbar': ctx.fillStyle = '#ffd700'; ctx.fillRect(-s*0.9,-s*0.5,s*1.8,s*1.0); ctx.fillStyle = '#fff'; ctx.fillRect(-s*0.7,-s*0.2,s*1.4,s*0.2); break;
+                    case 'sunflower':
+                        ctx.fillStyle = '#ffaa00'; ctx.beginPath(); ctx.arc(0,0,s*0.7,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#8B4513'; ctx.beginPath(); ctx.arc(0,0,s*0.3,0,Math.PI*2); ctx.fill();
+                        for (let i = 0; i < 8; i++) {
+                            const a = i*Math.PI/4;
+                            ctx.fillStyle = '#ffdd00'; ctx.beginPath(); ctx.ellipse(Math.cos(a)*s*0.5, Math.sin(a)*s*0.5, s*0.25, s*0.1, a, 0, Math.PI*2); ctx.fill();
+                        }
+                        break;
+                    case 'egg': ctx.fillStyle = '#fefae0'; ctx.beginPath(); ctx.ellipse(0,-s*0.1,s*0.6,s*0.75,0,0,Math.PI*2); ctx.fill(); break;
+                    case 'chick':
+                        ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(0,0,s*0.6,0,Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#ff9900'; ctx.beginPath(); ctx.moveTo(0,-s*0.5); ctx.lineTo(-s*0.2,-s*0.7); ctx.lineTo(s*0.2,-s*0.7); ctx.closePath(); ctx.fill();
+                        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-s*0.15,-s*0.1,s*0.08,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.15,-s*0.1,s*0.08,0,Math.PI*2); ctx.fill();
+                        break;
+                    case 'leaf': ctx.fillStyle = '#4caf50'; ctx.beginPath(); ctx.ellipse(0,0,s*0.7,s*0.35,0,0,Math.PI*2); ctx.fill(); ctx.strokeStyle = '#2e7d32'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-s*0.6,0); ctx.lineTo(s*0.6,0); ctx.stroke(); break;
+                    case 'tree': ctx.fillStyle = '#228B22'; ctx.beginPath(); ctx.moveTo(0,-s*0.8); ctx.lineTo(-s*0.6,0); ctx.lineTo(s*0.6,0); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#8B4513'; ctx.fillRect(-s*0.1,0,s*0.2,s*0.4); break;
+                    case 'stick': ctx.fillStyle = '#8B4513'; ctx.fillRect(-s*0.15,-s*0.7,s*0.3,s*1.4); break;
+                    default:
+                        ctx.beginPath();
+                        for (let i = 0; i < 8; i++) { const a = i*Math.PI/4, r = i%2===0?s:s*0.4; ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r); }
+                        ctx.closePath(); ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Segoe UI"'; ctx.textAlign = 'center';
+                if (star.type.doubleClick && star.clicksRemaining > 0) ctx.fillText(`${star.value} (${star.clicksRemaining})`, 0, -s-4);
+                else ctx.fillText(star.value, 0, -s-4);
+                ctx.restore();
+            }
+
+            for (const p of particles) {
+                const alpha = 1 - p.life / p.maxLife;
+                ctx.fillStyle = `hsla(${p.hue},100%,80%,${alpha})`;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI*2); ctx.fill();
+            }
+
+            for (const ft of floatingTexts) {
+                ctx.globalAlpha = Math.min(1, ft.life/20);
+                ctx.fillStyle = ft.color || '#ffd700'; ctx.font = 'bold 13px "Segoe UI"'; ctx.textAlign = 'center';
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.globalAlpha = 1;
+            }
         }
 
-        for(const p of particles){const alpha=1-p.life/p.maxLife;ctx.fillStyle=`hsla(${p.hue},100%,80%,${alpha})`;ctx.beginPath();ctx.arc(p.x,p.y,p.size*alpha,0,Math.PI*2);ctx.fill();}
-        for(const ft of floatingTexts){ctx.globalAlpha=Math.min(1,ft.life/20);ctx.fillStyle=ft.color||'#ffd700';ctx.font='bold 13px "Segoe UI"';ctx.textAlign='center';ctx.fillText(ft.text,ft.x,ft.y);ctx.globalAlpha=1;}
-    }
+        function gameLoop() { if (gameRunning) update(); draw(); requestAnimationFrame(gameLoop); }
 
-    function gameLoop(){if(gameRunning)update();draw();requestAnimationFrame(gameLoop);}
+        function saveGame() {
+            const save = { coins, totalCaught, wave, seeds, permMultLvl, luckLvl, slowPermLvl, catchRadiusLvl, starSizeLvl, autoCollectLvl, seedCapLvl, autoPlantLvl, starSkin, ownedStarSkins, groundSkin, ownedGroundSkins, skySkin, starCaughtCounts, seedsPlanted, playTime };
+            localStorage.setItem('starGardenSave', JSON.stringify(save));
+            const tops = JSON.parse(localStorage.getItem('starGardenTops') || '{"coins":[],"time":[],"caught":[],"seeds":[]}');
+            const entry = { name: playerName, value: coins, time: playTime, caught: totalCaught, seeds: seedsPlanted };
+            tops.coins.push(entry); tops.time.push(entry); tops.caught.push(entry); tops.seeds.push(entry);
+            tops.coins.sort((a,b) => b.value - a.value).splice(10);
+            tops.time.sort((a,b) => b.time - a.time).splice(10);
+            tops.caught.sort((a,b) => b.caught - a.caught).splice(10);
+            tops.seeds.sort((a,b) => b.seeds - a.seeds).splice(10);
+            localStorage.setItem('starGardenTops', JSON.stringify(tops));
+        }
 
-    function saveGame(){
-        const save={coins,totalCaught,wave,seeds,permMultLvl,luckLvl,slowPermLvl,catchRadiusLvl,starSizeLvl,autoCollectLvl,seedCapLvl,autoPlantLvl,starSkin,ownedStarSkins,groundSkin,ownedGroundSkins,skySkin,starCaughtCounts,seedsPlanted,playTime};
-        localStorage.setItem('starGardenSave',JSON.stringify(save));
-        const tops=JSON.parse(localStorage.getItem('starGardenTops')||'{"coins":[],"time":[],"caught":[],"seeds":[]}');
-        const entry={name:playerName,value:coins,time:playTime,caught:totalCaught,seeds:seedsPlanted};
-        tops.coins.push(entry);tops.time.push(entry);tops.caught.push(entry);tops.seeds.push(entry);
-        tops.coins.sort((a,b)=>b.value-a.value).splice(10);tops.time.sort((a,b)=>b.time-a.time).splice(10);tops.caught.sort((a,b)=>b.caught-a.caught).splice(10);tops.seeds.sort((a,b)=>b.seeds-a.seeds).splice(10);
-        localStorage.setItem('starGardenTops',JSON.stringify(tops));
-    }
+        function loadGame() {
+            const raw = localStorage.getItem('starGardenSave');
+            if (!raw) return;
+            try {
+                const s = JSON.parse(raw);
+                coins = s.coins || 0; totalCaught = s.totalCaught || 0; wave = s.wave || 1; seeds = Math.min(s.seeds || 0, getMaxSeeds());
+                permMultLvl = s.permMultLvl || 1; luckLvl = s.luckLvl || 0; slowPermLvl = s.slowPermLvl || 0; catchRadiusLvl = s.catchRadiusLvl || 0; starSizeLvl = s.starSizeLvl || 0;
+                autoCollectLvl = s.autoCollectLvl || 0; seedCapLvl = s.seedCapLvl || 1; autoPlantLvl = s.autoPlantLvl || 0;
+                starSkin = s.starSkin || 'default'; ownedStarSkins = s.ownedStarSkins || ['default']; groundSkin = s.groundSkin || 'green'; ownedGroundSkins = s.ownedGroundSkins || ['green']; skySkin = s.skySkin || 'default';
+                starCaughtCounts = s.starCaughtCounts || {}; seedsPlanted = s.seedsPlanted || 0; playTime = s.playTime || 0;
+            } catch(e) {}
+            updateUI();
+        }
+        <script>
+        // ==================== МАГАЗИН ====================
+        function renderShop(tab) {
+            const c = document.getElementById('shopContent');
+            let html = '';
 
-    function loadGame(){
-        const raw=localStorage.getItem('starGardenSave');if(!raw)return;
-        try{const s=JSON.parse(raw);coins=s.coins||0;totalCaught=s.totalCaught||0;wave=s.wave||1;seeds=Math.min(s.seeds||0,getMaxSeeds());permMultLvl=s.permMultLvl||1;luckLvl=s.luckLvl||0;slowPermLvl=s.slowPermLvl||0;catchRadiusLvl=s.catchRadiusLvl||0;starSizeLvl=s.starSizeLvl||0;autoCollectLvl=s.autoCollectLvl||0;seedCapLvl=s.seedCapLvl||1;autoPlantLvl=s.autoPlantLvl||0;starSkin=s.starSkin||'default';ownedStarSkins=s.ownedStarSkins||['default'];groundSkin=s.groundSkin||'green';ownedGroundSkins=s.ownedGroundSkins||['green'];skySkin=s.skySkin||'default';starCaughtCounts=s.starCaughtCounts||{};seedsPlanted=s.seedsPlanted||0;playTime=s.playTime||0;}catch(e){}
-        updateUI();
-    }
+            if (tab === 'temp') {
+                html += `<div class="shop-item"><span>💥 x2 монет (10с)</span><span>💰 ${tempPrices.x2}</span><button id="buyTempX2">${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🐌 Замедление (5с)</span><span>💰 ${tempPrices.slow}</span><button id="buySlow">${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🧲 Магнит (8с)</span><span>💰 ${tempPrices.magnet}</span><button id="buyMagnet">${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>💣 Собрать все</span><span>💰 ${tempPrices.collectAll}</span><button id="buyCollectAll">${t('buy')}</button></div>`;
+            } else if (tab === 'perm') {
+                const multCost = Math.floor(200 * Math.pow(2.0, permMultLvl - 1));
+                html += `<div class="shop-item"><span>🔮 Множитель (ур.${permMultLvl}/20)</span><span>💰 ${permMultLvl >= 20 ? t('max') : multCost}</span><button id="buyPermMult" ${permMultLvl >= 20 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🍀 Удача (ур.${luckLvl}/10)</span><span>💰 ${luckLvl >= 10 ? t('max') : Math.floor(150 * (luckLvl + 1))}</span><button id="buyLuck" ${luckLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🐌 Замедление (ур.${slowPermLvl}/10)</span><span>💰 ${slowPermLvl >= 10 ? t('max') : Math.floor(120 * (slowPermLvl + 1))}</span><button id="buySlowPerm" ${slowPermLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🎯 Радиус (ур.${catchRadiusLvl}/10)</span><span>💰 ${catchRadiusLvl >= 10 ? t('max') : Math.floor(100 * (catchRadiusLvl + 1))}</span><button id="buyCursor" ${catchRadiusLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>⭐ Размер звёзд (ур.${starSizeLvl}/10)</span><span>💰 ${starSizeLvl >= 10 ? t('max') : Math.floor(150 * (starSizeLvl + 1))}</span><button id="buyStarSize" ${starSizeLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🤖 Автосбор (ур.${autoCollectLvl}/5)</span><span>💰 ${autoCollectLvl >= 5 ? t('max') : Math.floor(300 * (autoCollectLvl + 1))}</span><button id="buyAuto" ${autoCollectLvl >= 5 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🌱 Вместимость семян (ур.${seedCapLvl}/10)</span><span>💰 ${seedCapLvl >= 10 ? t('max') : Math.floor(250 * seedCapLvl)}</span><button id="buySeedCap" ${seedCapLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+                html += `<div class="shop-item"><span>🤖 Авто-посадка (ур.${autoPlantLvl}/20)</span><span>💰 ${autoPlantLvl >= 20 ? t('max') : Math.floor(100 * (autoPlantLvl + 1))}</span><button id="buyAutoPlant" ${autoPlantLvl >= 20 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+            } else if (tab === 'starskins') {
+                const allSkins = [
+                    {id:'star4', name:'✦ Четырёхконечная', cost:300},
+                    {id:'star5', name:'⭐ Пятиконечная', cost:350},
+                    {id:'triangle', name:'🔺 Треугольник', cost:200},
+                    {id:'diamond', name:'💎 Ромбик', cost:280},
+                    {id:'square', name:'🟪 Квадрат', cost:180},
+                    {id:'cat', name:'🐱 Котик', cost:500},
+                    {id:'dog', name:'🐶 Собачка', cost:300},
+                    {id:'hamster', name:'🐹 Хомяк', cost:300},
+                    {id:'oval', name:'🥚 Овал', cost:190},
+                    {id:'semicircle', name:'🌓 Полукруг', cost:170},
+                    {id:'rectangle', name:'📏 Прямоугольник', cost:160},
+                    {id:'goldbar', name:'💰 Слиток', cost:350},
+                    {id:'circle', name:'⚪ Кружок', cost:250},
+                    {id:'sunflower', name:'🌻 Подсолнух', cost:400},
+                    {id:'egg', name:'🥚 Яйцо', cost:220},
+                    {id:'chick', name:'🐤 Цыплёнок', cost:320},
+                    {id:'leaf', name:'🍃 Листик', cost:240},
+                    {id:'tree', name:'🌳 Дерево', cost:450},
+                    {id:'stick', name:'🥢 Палка', cost:180},
+                    {id:'pixel', name:'👾 Пиксель', cost:400},
+                    {id:'moon', name:'🌙 Луна', cost:450},
+                    {id:'bee', name:'🐝 Пчела', cost:380}
+                ];
+                allSkins.forEach(s => {
+                    const owned = ownedStarSkins.includes(s.id);
+                    html += `<div class="shop-item"><span>${s.name}</span><span>💰 ${owned ? '✓' : s.cost}</span>`;
+                    if (!owned) html += `<button class="buySkin" data-skin="${s.id}" data-cost="${s.cost}">${t('buy')}</button>`;
+                    else if (starSkin === s.id) html += `<span>✅</span>`;
+                    else html += `<button class="equipSkin" data-skin="${s.id}">${t('equip')}</button>`;
+                    html += `</div>`;
+                });
+            } else if (tab === 'groundskins') {
+                const grounds = [
+                    {id:'green', name:'🌿 Зелёный', cost:200},
+                    {id:'pink', name:'🌸 Розовый', cost:250},
+                    {id:'gold', name:'✨ Золотой', cost:300},
+                    {id:'snow', name:'❄️ Снежный', cost:280},
+                    {id:'lava', name:'🌋 Лавовый', cost:350},
+                    {id:'night', name:'🌑 Ночной', cost:220}
+                ];
+                grounds.forEach(s => {
+                    const owned = ownedGroundSkins.includes(s.id);
+                    html += `<div class="shop-item"><span>${s.name}</span><span>💰 ${owned ? '✓' : s.cost}</span>`;
+                    if (!owned) html += `<button class="buyGround" data-skin="${s.id}" data-cost="${s.cost}">${t('buy')}</button>`;
+                    else if (groundSkin === s.id) html += `<span>✅</span>`;
+                    else html += `<button class="equipGround" data-skin="${s.id}">${t('equip')}</button>`;
+                    html += `</div>`;
+                });
+            }
 
-    // МАГАЗИН, САД, СТАТИСТИКА – всё остальное, что есть в твоём коде, остаётся без изменений.
-    // (для краткости я не дублирую – ты вставляешь эти функции из предыдущей версии,
-    //  они полностью совместимы и работают)
-    // Если нужна именно полная часть – скажи "нужен полный код магазина и сада", я пришлю третью часть.
-    // Чтобы не перегружать сообщение, я вынес в конец только инициализацию и события.
+            c.innerHTML = html;
 
-    function renderShop(tab){/* ... полный код ... */}   // ← ВСТАВЬ СЮДА ВЕСЬ renderShop
-    function initShopTabs(){/* ... */}                   // ← ВСТАВЬ initShopTabs
-    function openGarden(){/* ... */}                     // ← ВСТАВЬ сад
-    function updateGardenUI(){/* ... */}
-    function plantSeed(){/* ... */}
-    function harvestReady(){/* ... */}
-    function harvestPlant(){/* ... */}
-    function renderStats(){/* ... */}
+            setTimeout(() => {
+                document.getElementById('buyTempX2')?.addEventListener('click', () => {
+                    if (coins >= tempPrices.x2) { coins -= tempPrices.x2; tempMult = 2; tempMultTimer = 600; tempCounts.x2++; tempPrices.x2 = Math.floor(100 * Math.pow(1.5, tempCounts.x2)); sfxBuy(); renderShop('temp'); }
+                });
+                document.getElementById('buySlow')?.addEventListener('click', () => {
+                    if (coins >= tempPrices.slow) { coins -= tempPrices.slow; slowMotion = true; slowTimer = 300; tempCounts.slow++; tempPrices.slow = Math.floor(80 * Math.pow(1.4, tempCounts.slow)); sfxBuy(); renderShop('temp'); }
+                });
+                document.getElementById('buyMagnet')?.addEventListener('click', () => {
+                    if (coins >= tempPrices.magnet) { coins -= tempPrices.magnet; magnetActive = true; magnetTimer = 480; tempCounts.magnet++; tempPrices.magnet = Math.floor(60 * Math.pow(1.3, tempCounts.magnet)); sfxBuy(); renderShop('temp'); }
+                });
+                document.getElementById('buyCollectAll')?.addEventListener('click', () => {
+                    if (coins >= tempPrices.collectAll && fallingStars.length > 0) { coins -= tempPrices.collectAll; [...fallingStars].forEach(s => catchStar(s)); tempCounts.collectAll++; tempPrices.collectAll = Math.floor(150 * Math.pow(1.6, tempCounts.collectAll)); sfxBuy(); renderShop('temp'); }
+                });
+                document.getElementById('buyPermMult')?.addEventListener('click', () => {
+                    const cost = Math.floor(200 * Math.pow(2.0, permMultLvl - 1)); if (coins >= cost && permMultLvl < 20) { coins -= cost; permMultLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buyLuck')?.addEventListener('click', () => {
+                    const cost = Math.floor(150 * (luckLvl + 1)); if (coins >= cost && luckLvl < 10) { coins -= cost; luckLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buySlowPerm')?.addEventListener('click', () => {
+                    const cost = Math.floor(120 * (slowPermLvl + 1)); if (coins >= cost && slowPermLvl < 10) { coins -= cost; slowPermLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buyCursor')?.addEventListener('click', () => {
+                    const cost = Math.floor(100 * (catchRadiusLvl + 1)); if (coins >= cost && catchRadiusLvl < 10) { coins -= cost; catchRadiusLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buyStarSize')?.addEventListener('click', () => {
+                    const cost = Math.floor(150 * (starSizeLvl + 1)); if (coins >= cost && starSizeLvl < 10) { coins -= cost; starSizeLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buyAuto')?.addEventListener('click', () => {
+                    const cost = Math.floor(300 * (autoCollectLvl + 1)); if (coins >= cost && autoCollectLvl < 5) { coins -= cost; autoCollectLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buySeedCap')?.addEventListener('click', () => {
+                    const cost = Math.floor(250 * seedCapLvl); if (coins >= cost && seedCapLvl < 10) { coins -= cost; seedCapLvl++; sfxBuy(); renderShop('perm'); }
+                });
+                document.getElementById('buyAutoPlant')?.addEventListener('click', () => {
+                    const cost = Math.floor(100 * (autoPlantLvl + 1)); if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
+                });
 
-    function updateAllTexts(){
-        document.getElementById('playBtn').textContent=t('play');
-        document.getElementById('shopMenuBtn').textContent=t('shop');
-        document.getElementById('gardenMenuBtn').textContent=t('garden');
-        document.getElementById('statsMenuBtn').textContent=t('stats');
-        document.getElementById('settingsMenuBtn').textContent=t('settings');
-        document.getElementById('tutorialMenuBtn').textContent=t('tutorial');
-        document.getElementById('backToMenuBtn').innerHTML='🚪 '+t('back');
-        document.getElementById('plantSeedBtn').textContent=t('plant');
-        document.getElementById('harvestBtn').textContent=t('harvest');
-        document.getElementById('resetWaveBtn').textContent=t('resetWave');
-        document.getElementById('tutorialText').innerHTML=t('tutorialText');
-        initShopTabs(); updateUI();
-    }
+                document.querySelectorAll('.buySkin').forEach(b => b.addEventListener('click', () => {
+                    const skin = b.dataset.skin, cost = parseInt(b.dataset.cost); if (coins >= cost) { coins -= cost; ownedStarSkins.push(skin); starSkin = skin; sfxBuy(); renderShop('starskins'); }
+                }));
+                document.querySelectorAll('.equipSkin').forEach(b => b.addEventListener('click', () => { starSkin = b.dataset.skin; renderShop('starskins'); }));
+                document.querySelectorAll('.buyGround').forEach(b => b.addEventListener('click', () => {
+                    const skin = b.dataset.skin, cost = parseInt(b.dataset.cost); if (coins >= cost) { coins -= cost; ownedGroundSkins.push(skin); groundSkin = skin; sfxBuy(); renderShop('groundskins'); }
+                }));
+                document.querySelectorAll('.equipGround').forEach(b => b.addEventListener('click', () => { groundSkin = b.dataset.skin; renderShop('groundskins'); }));
+            }, 50);
+        }
 
-    document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>{currentLang=b.dataset.lang;localStorage.setItem('starGardenLang',currentLang);document.querySelectorAll('.lang-btn').forEach(b2=>b2.classList.toggle('active',b2.dataset.lang===currentLang));updateAllTexts();}));
-    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
+        function initShopTabs() {
+            const tabsContainer = document.getElementById('shopTabs');
+            tabsContainer.innerHTML = `<button class="tab-btn active" data-tab="temp">${t('temp')}</button><button class="tab-btn" data-tab="perm">${t('perm')}</button><button class="tab-btn" data-tab="starskins">${t('starskins')}</button><button class="tab-btn" data-tab="groundskins">${t('groundskins')}</button>`;
+            tabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => { tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderShop(btn.dataset.tab); }));
+        }
 
-    document.getElementById('playBtn').addEventListener('click',()=>{document.getElementById('mainMenu').style.display='none';document.getElementById('gameScreen').style.display='flex';gameRunning=true;initAudio();lastTime=Date.now();});
-    document.getElementById('backToMenuBtn').addEventListener('click',()=>{gameRunning=false;document.getElementById('gameScreen').style.display='none';document.getElementById('mainMenu').style.display='flex';saveGame();});
-    document.getElementById('shopMenuBtn').addEventListener('click',()=>{document.getElementById('shopModal').classList.add('active');initShopTabs();renderShop('temp');});
-    document.getElementById('ingameShopBtn').addEventListener('click',()=>{document.getElementById('shopModal').classList.add('active');initShopTabs();renderShop('temp');});
-    document.getElementById('closeShop').addEventListener('click',()=>document.getElementById('shopModal').classList.remove('active'));
-    document.getElementById('gardenMenuBtn').addEventListener('click',openGarden);
-    document.getElementById('ingameGardenBtn').addEventListener('click',openGarden);
-    document.getElementById('closeGarden').addEventListener('click',()=>document.getElementById('gardenModal').classList.remove('active'));
-    document.getElementById('plantSeedBtn').addEventListener('click',plantSeed);
-    document.getElementById('harvestBtn').addEventListener('click',harvestPlant);
-    document.getElementById('settingsMenuBtn').addEventListener('click',()=>document.getElementById('settingsModal').classList.add('active'));
-    document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsModal').classList.remove('active'));
-    document.getElementById('resetWaveBtn').addEventListener('click',()=>{wave=1;tempPrices={x2:100,slow:80,magnet:60,collectAll:150};tempCounts={x2:0,slow:0,magnet:0,collectAll:0};document.getElementById('settingsModal').classList.remove('active');});
-    document.getElementById('statsMenuBtn').addEventListener('click',()=>{document.getElementById('statsModal').classList.add('active');renderStats();});
-    document.getElementById('closeStats').addEventListener('click',()=>document.getElementById('statsModal').classList.remove('active'));
-    document.getElementById('tutorialMenuBtn').addEventListener('click',()=>{document.getElementById('tutorialText').innerHTML=t('tutorialText');document.getElementById('tutorialModal').classList.add('active');});
-    document.getElementById('closeTutorial').addEventListener('click',()=>document.getElementById('tutorialModal').classList.remove('active'));
+        // ==================== САД ====================
+        function openGarden() {
+            document.getElementById('gardenSeedCount').textContent = seeds;
+            document.getElementById('autoPlantLevel').textContent = autoPlantLvl;
+            updateGardenUI();
+            document.getElementById('gardenModal').classList.add('active');
+        }
 
-    document.getElementById('themeSelect').addEventListener('change',function(){document.getElementById('bodyTheme').className=this.value;localStorage.setItem('starGardenTheme',this.value);});
-    document.getElementById('fontSelect').addEventListener('change',function(){document.body.style.setProperty('--font',this.value);localStorage.setItem('starGardenFont',this.value);});
-    document.getElementById('skySelect').addEventListener('change',function(){skySkin=this.value;localStorage.setItem('starGardenSky',this.value);});
+        function updateGardenUI() {
+            const statusP = document.getElementById('gardenStatus');
+            const timerP = document.getElementById('gardenTimer');
+            const plantBtn = document.getElementById('plantSeedBtn');
+            const harvestBtn = document.getElementById('harvestBtn');
 
-    const savedTheme=localStorage.getItem('starGardenTheme');if(savedTheme){document.getElementById('bodyTheme').className=savedTheme;document.getElementById('themeSelect').value=savedTheme;}
-    const savedFont=localStorage.getItem('starGardenFont');if(savedFont){document.body.style.setProperty('--font',savedFont);document.getElementById('fontSelect').value=savedFont;}
-    const savedSky=localStorage.getItem('starGardenSky');if(savedSky){skySkin=savedSky;document.getElementById('skySelect').value=savedSky;}
+            if (gardenGrowing) {
+                statusP.textContent = '🌱 Растёт...';
+                timerP.style.display = 'block';
+                document.getElementById('gardenTimeLeft').textContent = Math.ceil(gardenTimer / 60);
+                plantBtn.style.display = 'none';
+                harvestBtn.style.display = 'none';
+            } else if (gardenReward) {
+                statusP.textContent = '🎁 Урожай готов!';
+                timerP.style.display = 'none';
+                plantBtn.style.display = 'none';
+                harvestBtn.style.display = 'inline-block';
+            } else {
+                statusP.textContent = 'Грядка пуста';
+                timerP.style.display = 'none';
+                plantBtn.style.display = seeds > 0 ? 'inline-block' : 'none';
+                plantBtn.disabled = seeds <= 0;
+                harvestBtn.style.display = 'none';
+            }
+        }
 
-    canvas.addEventListener('click',e=>{const pos=getClickPos(e);mouseX=pos.x;mouseY=pos.y;handleClick(pos.x,pos.y);});
-    canvas.addEventListener('mousemove',e=>{const pos=getClickPos(e);mouseX=pos.x;mouseY=pos.y;});
-    canvas.addEventListener('mouseleave',()=>{mouseX=-100;mouseY=-100;});
-    canvas.addEventListener('touchstart',e=>{e.preventDefault();const pos=getClickPos(e.touches[0]);mouseX=pos.x;mouseY=pos.y;handleClick(pos.x,pos.y);},{passive:false});
-    canvas.addEventListener('touchmove',e=>{e.preventDefault();const pos=getClickPos(e.touches[0]);mouseX=pos.x;mouseY=pos.y;},{passive:false});
-    canvas.addEventListener('touchend',()=>{mouseX=-100;mouseY=-100;});
+        function plantSeed() {
+            if (seeds <= 0 || gardenGrowing || gardenReward) return;
+            seeds--;
+            seedsPlanted++;
+            gardenGrowing = true;
+            gardenReward = null;
+            gardenTimer = 7200;
+            updateUI();
+            updateGardenUI();
+        }
 
-    loadGame();
-    updateAllTexts();
-    resizeCanvas();
-    gameLoop();
+        function harvestReady() {
+            const r = Math.random();
+            if (r < 0.35) gardenReward = { type: 'buff', buff: 'x2' };
+            else if (r < 0.65) gardenReward = { type: 'buff', buff: 'slow' };
+            else if (r < 0.85) gardenReward = { type: 'buff', buff: 'magnet' };
+            else if (r < 0.99) {
+                const allSkins = ['star4', 'star5', 'triangle', 'diamond', 'square', 'cat', 'dog', 'hamster', 'oval', 'semicircle', 'rectangle', 'goldbar', 'circle', 'sunflower', 'egg', 'chick', 'leaf', 'tree', 'stick', 'pixel', 'moon', 'bee'];
+                const avail = allSkins.filter(s => !ownedStarSkins.includes(s));
+                gardenReward = avail.length > 0 ? { type: 'skin', skin: avail[Math.floor(Math.random() * avail.length)] } : { type: 'buff', buff: 'x2' };
+            } else {
+                gardenReward = { type: 'skin', skin: 'crown' };
+            }
+            updateGardenUI();
+        }
 
-    console.log('✅ Игра работает на мобильных!');
-})();
-</script>
+        function harvestPlant() {
+            if (!gardenReward) return;
+            sfxHarvest();
+            if (gardenReward.type === 'buff') {
+                switch (gardenReward.buff) {
+                    case 'x2': tempMult = 2; tempMultTimer = 2700; break;
+                    case 'slow': slowMotion = true; slowTimer = 2700; break;
+                    case 'magnet': magnetActive = true; magnetTimer = 2700; break;
+                }
+            } else if (gardenReward.type === 'skin') {
+                if (!ownedStarSkins.includes(gardenReward.skin)) ownedStarSkins.push(gardenReward.skin);
+                starSkin = gardenReward.skin;
+            }
+            gardenReward = null;
+            gardenGrowing = false;
+            updateGardenUI();
+        }
+
+        // ==================== СТАТИСТИКА ====================
+        function renderStats() {
+            const tops = JSON.parse(localStorage.getItem('starGardenTops') || '{"coins":[],"time":[],"caught":[],"seeds":[]}');
+            let html = `<p style="margin-bottom:10px;">👥 ${t('totalPlayers')} ${Math.max(tops.coins.length, tops.time.length, tops.caught.length, tops.seeds.length)}</p>`;
+            const categories = [
+                { key: 'coins', title: t('statCoins'), prop: 'value' },
+                { key: 'time', title: t('statTime'), prop: 'time' },
+                { key: 'caught', title: t('statCaught'), prop: 'caught' },
+                { key: 'seeds', title: t('statSeeds'), prop: 'seeds' }
+            ];
+            categories.forEach(cat => {
+                html += `<p style="color:var(--gold); margin-top:10px;">${cat.title}</p>`;
+                html += '<table class="stats-table"><tr><th>#</th><th>Имя</th><th>' + (cat.key === 'coins' ? 'Монеты' : cat.key === 'time' ? 'Секунд' : 'Звёзд') + '</th></tr>';
+                (tops[cat.key] || []).slice(0, 5).forEach((e, i) => {
+                    html += `<tr><td>${i + 1}</td><td>${e.name}</td><td>${e[cat.prop]}</td></tr>`;
+                });
+                html += '</table>';
+            });
+            document.getElementById('statsContent').innerHTML = html;
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        function updateAllTexts() {
+            document.getElementById('playBtn').textContent = t('play');
+            document.getElementById('shopMenuBtn').textContent = t('shop');
+            document.getElementById('gardenMenuBtn').textContent = t('garden');
+            document.getElementById('statsMenuBtn').textContent = t('stats');
+            document.getElementById('settingsMenuBtn').textContent = t('settings');
+            document.getElementById('tutorialMenuBtn').textContent = t('tutorial');
+            document.getElementById('backToMenuBtn').innerHTML = '🚪 ' + t('back');
+            document.getElementById('plantSeedBtn').textContent = t('plant');
+            document.getElementById('harvestBtn').textContent = t('harvest');
+            document.getElementById('resetWaveBtn').textContent = t('resetWave');
+            document.getElementById('tutorialText').innerHTML = t('tutorialText');
+            initShopTabs();
+            updateUI();
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => {
+            currentLang = b.dataset.lang;
+            localStorage.setItem('starGardenLang', currentLang);
+            document.querySelectorAll('.lang-btn').forEach(b2 => b2.classList.toggle('active', b2.dataset.lang === currentLang));
+            updateAllTexts();
+        }));
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
+            gameRunning = true;
+            initAudio();
+            lastTime = Date.now();
+        });
+        document.getElementById('backToMenuBtn').addEventListener('click', () => {
+            gameRunning = false;
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'flex';
+            saveGame();
+        });
+        document.getElementById('shopMenuBtn').addEventListener('click', () => { document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
+        document.getElementById('ingameShopBtn').addEventListener('click', () => { document.getElementById('shopModal').classList.add('active'); initShopTabs(); renderShop('temp'); });
+        document.getElementById('closeShop').addEventListener('click', () => document.getElementById('shopModal').classList.remove('active'));
+        document.getElementById('gardenMenuBtn').addEventListener('click', openGarden);
+        document.getElementById('ingameGardenBtn').addEventListener('click', openGarden);
+        document.getElementById('closeGarden').addEventListener('click', () => document.getElementById('gardenModal').classList.remove('active'));
+        document.getElementById('plantSeedBtn').addEventListener('click', plantSeed);
+        document.getElementById('harvestBtn').addEventListener('click', harvestPlant);
+        document.getElementById('settingsMenuBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.add('active'));
+        document.getElementById('closeSettings').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('active'));
+        document.getElementById('resetWaveBtn').addEventListener('click', () => {
+            wave = 1;
+            tempPrices = { x2: 100, slow: 80, magnet: 60, collectAll: 150 };
+            tempCounts = { x2: 0, slow: 0, magnet: 0, collectAll: 0 };
+            document.getElementById('settingsModal').classList.remove('active');
+        });
+        document.getElementById('statsMenuBtn').addEventListener('click', () => { document.getElementById('statsModal').classList.add('active'); renderStats(); });
+        document.getElementById('closeStats').addEventListener('click', () => document.getElementById('statsModal').classList.remove('active'));
+        document.getElementById('tutorialMenuBtn').addEventListener('click', () => { document.getElementById('tutorialText').innerHTML = t('tutorialText'); document.getElementById('tutorialModal').classList.add('active'); });
+        document.getElementById('closeTutorial').addEventListener('click', () => document.getElementById('tutorialModal').classList.remove('active'));
+
+        document.getElementById('themeSelect').addEventListener('change', function () { document.getElementById('bodyTheme').className = this.value; localStorage.setItem('starGardenTheme', this.value); });
+        document.getElementById('fontSelect').addEventListener('change', function () { document.body.style.setProperty('--font', this.value); localStorage.setItem('starGardenFont', this.value); });
+        document.getElementById('skySelect').addEventListener('change', function () { skySkin = this.value; localStorage.setItem('starGardenSky', this.value); });
+
+        const savedTheme = localStorage.getItem('starGardenTheme');
+        if (savedTheme) { document.getElementById('bodyTheme').className = savedTheme; document.getElementById('themeSelect').value = savedTheme; }
+        const savedFont = localStorage.getItem('starGardenFont');
+        if (savedFont) { document.body.style.setProperty('--font', savedFont); document.getElementById('fontSelect').value = savedFont; }
+        const savedSky = localStorage.getItem('starGardenSky');
+        if (savedSky) { skySkin = savedSky; document.getElementById('skySelect').value = savedSky; }
+
+        canvas.addEventListener('click', e => { const pos = getClickPos(e); mouseX = pos.x; mouseY = pos.y; handleClick(pos.x, pos.y); });
+        canvas.addEventListener('mousemove', e => { const pos = getClickPos(e); mouseX = pos.x; mouseY = pos.y; });
+        canvas.addEventListener('mouseleave', () => { mouseX = -100; mouseY = -100; });
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); const pos = getClickPos(e.touches[0]); mouseX = pos.x; mouseY = pos.y; handleClick(pos.x, pos.y); }, { passive: false });
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); const pos = getClickPos(e.touches[0]); mouseX = pos.x; mouseY = pos.y; }, { passive: false });
+        canvas.addEventListener('touchend', () => { mouseX = -100; mouseY = -100; });
+
+        loadGame();
+        updateAllTexts();
+        resizeCanvas();
+        gameLoop();
+
+        console.log('🌟 Star Garden v2.0.1 готов! Все скины, магазин и сад на месте.');
+    })();
+    </script>
 </body>
 </html>
