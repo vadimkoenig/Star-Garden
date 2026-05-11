@@ -1304,11 +1304,14 @@ canvas.addEventListener('touchmove', e => {
     mouseX = pos.x; mouseY = pos.y;
 }, { passive: false });
 canvas.addEventListener('touchend', () => { mouseX = -100; mouseY = -100; });
-
 loadGame();
 updateAllTexts();
 updateUI();
 resizeCanvas();
+
+// Принудительный запуск спавна звёзд
+gameRunning = true;
+lastTime = Date.now();
 gameLoop();
 
 console.log('🌟 Star Garden v2.0.2 загружен!');
