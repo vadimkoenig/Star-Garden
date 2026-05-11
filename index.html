@@ -263,17 +263,15 @@
     const ctx = canvas.getContext('2d');
     let W = 500, H = 520;
 
-    function resizeCanvas() {
-        const wrapper = document.querySelector('.game-wrapper');
-        const wrapperWidth = wrapper ? wrapper.clientWidth : window.innerWidth;
-        const maxW = Math.min(wrapperWidth - 10, 700);
-        const ratio = 500 / 520;
-        canvas.style.width = maxW + 'px';
-        canvas.style.height = (maxW / ratio) + 'px';
-        canvas.style.maxWidth = '100%';
-        W = 500; H = 520;
-        canvas.width = W; canvas.height = H;
-    }
+  function resizeCanvas() {
+    const maxW = Math.min(window.innerWidth - 20, 700);
+    const ratio = 500 / 520;
+    canvas.style.width = maxW + 'px';
+    canvas.style.height = (maxW / ratio) + 'px';
+    canvas.style.maxWidth = '100%';
+    W = 500; H = 520;
+    canvas.width = W; canvas.height = H;
+}
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
