@@ -423,6 +423,25 @@ function handleClick(cx, cy) {
 
 function update() {
     if (!gameRunning) return;
+
+    // ВРЕМЕННЫЙ ХАК – ГАРАНТИРОВАННЫЙ СПАВН
+    if (frameCount < 10) {
+        for (let i = 0; i < 8; i++) {
+            const type = starTypes[0];
+            fallingStars.push({
+                x: random(50, W - 50),
+                y: random(100, 250),
+                speed: 1.2,
+                size: 12,
+                hue: 50,
+                value: 1,
+                type: type,
+                twinkle: random(0, Math.PI * 2),
+                clicksRemaining: 0
+            });
+        }
+    }
+
     frameCount++;
     
     const now = Date.now();
