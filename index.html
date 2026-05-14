@@ -510,12 +510,12 @@ if (fallingStars.length < 15) {
     for (const f of flowers) f.phase += 0.03;
 
     if (autoCollectLvl > 0 && fallingStars.length > 0) {
-        const interval = Math.max(30, 200 - autoCollectLvl * 35);
-        if (frameCount % interval === 0) {
-            const target = fallingStars.reduce((a, b) => a.y > b.y ? a : b);
-            if (target) catchStar(target);
-        }
+    const interval = Math.max(60, 300 - autoCollectLvl * 40);
+    if (frameCount % interval === 0) {
+        const target = fallingStars[Math.floor(Math.random() * fallingStars.length)];
+        if (target) catchStar(target);
     }
+}
 
     updateUI();
     saveGame();
@@ -858,17 +858,31 @@ function renderShop(tab) {
         html += `<div class="shop-item"><span>🐌 Замедление (5с)</span><span>💰 ${tempPrices.slow}</span><button id="buySlow">${t('buy')}</button></div>`;
         html += `<div class="shop-item"><span>🧲 Магнит (8с)</span><span>💰 ${tempPrices.magnet}</span><button id="buyMagnet">${t('buy')}</button></div>`;
         html += `<div class="shop-item"><span>💣 Собрать все</span><span>💰 ${tempPrices.collectAll}</span><button id="buyCollectAll">${t('buy')}</button></div>`;
-    } else if (tab === 'perm') {
-        const multCost = Math.floor(200 * Math.pow(2.0, permMultLvl-1));
-        html += `<div class="shop-item"><span>🔮 Множитель (ур.${permMultLvl}/20)</span><span>💰 ${permMultLvl>=20?t('max'):multCost}</span><button id="buyPermMult" ${permMultLvl>=20?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🍀 Удача (ур.${luckLvl}/10)</span><span>💰 ${luckLvl>=10?t('max'):Math.floor(150*(luckLvl+1))}</span><button id="buyLuck" ${luckLvl>=10?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🐌 Замедление (ур.${slowPermLvl}/10)</span><span>💰 ${slowPermLvl>=10?t('max'):Math.floor(120*(slowPermLvl+1))}</span><button id="buySlowPerm" ${slowPermLvl>=10?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🎯 Радиус (ур.${catchRadiusLvl}/10)</span><span>💰 ${catchRadiusLvl>=10?t('max'):Math.floor(100*(catchRadiusLvl+1))}</span><button id="buyCursor" ${catchRadiusLvl>=10?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>⭐ Размер звёзд (ур.${starSizeLvl}/10)</span><span>💰 ${starSizeLvl>=10?t('max'):Math.floor(150*(starSizeLvl+1))}</span><button id="buyStarSize" ${starSizeLvl>=10?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🤖 Автосбор (ур.${autoCollectLvl}/5)</span><span>💰 ${autoCollectLvl>=5?t('max'):Math.floor(300*(autoCollectLvl+1))}</span><button id="buyAuto" ${autoCollectLvl>=5?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🌱 Вместимость семян (ур.${seedCapLvl}/10)</span><span>💰 ${seedCapLvl>=10?t('max'):Math.floor(250*(seedCapLvl))}</span><button id="buySeedCap" ${seedCapLvl>=10?'disabled':''}>${t('buy')}</button></div>`;
-        html += `<div class="shop-item"><span>🤖 Авто-посадка (ур.${autoPlantLvl}/20)</span><span>💰 ${autoPlantLvl>=20?t('max'):Math.floor(100*(autoPlantLvl+1))}</span><button id="buyAutoPlant" ${autoPlantLvl>=20?'disabled':''}>${t('buy')}</button></div>`;
-    } else if (tab === 'starskins') {
+} else if (tab === 'perm') {
+    const multCost = Math.floor(150 * Math.pow(1.6, permMultLvl - 1));
+    html += `<div class="shop-item"><span>🔮 Множитель (ур.${permMultLvl}/20)</span><span>💰 ${permMultLvl >= 20 ? t('max') : multCost}</span><button id="buyPermMult" ${permMultLvl >= 20 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const luckCost = Math.floor(100 * Math.pow(1.7, luckLvl));
+    html += `<div class="shop-item"><span>🍀 Удача (ур.${luckLvl}/10)</span><span>💰 ${luckLvl >= 10 ? t('max') : luckCost}</span><button id="buyLuck" ${luckLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const slowCost = Math.floor(80 * Math.pow(1.7, slowPermLvl));
+    html += `<div class="shop-item"><span>🐌 Замедление (ур.${slowPermLvl}/10)</span><span>💰 ${slowPermLvl >= 10 ? t('max') : slowCost}</span><button id="buySlowPerm" ${slowPermLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const cursorCost = Math.floor(90 * Math.pow(1.7, catchRadiusLvl));
+    html += `<div class="shop-item"><span>🎯 Радиус (ур.${catchRadiusLvl}/10)</span><span>💰 ${catchRadiusLvl >= 10 ? t('max') : cursorCost}</span><button id="buyCursor" ${catchRadiusLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const sizeCost = Math.floor(70 * Math.pow(1.7, starSizeLvl));
+    html += `<div class="shop-item"><span>⭐ Размер звёзд (ур.${starSizeLvl}/10)</span><span>💰 ${starSizeLvl >= 10 ? t('max') : sizeCost}</span><button id="buyStarSize" ${starSizeLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const autoCost = Math.floor(500 * Math.pow(2.0, autoCollectLvl));
+    html += `<div class="shop-item"><span>🤖 Автосбор (ур.${autoCollectLvl}/5)</span><span>💰 ${autoCollectLvl >= 5 ? t('max') : autoCost}</span><button id="buyAuto" ${autoCollectLvl >= 5 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const seedCapCost = Math.floor(200 * Math.pow(1.8, seedCapLvl - 1));
+    html += `<div class="shop-item"><span>🌱 Вместимость семян (ур.${seedCapLvl}/10)</span><span>💰 ${seedCapLvl >= 10 ? t('max') : seedCapCost}</span><button id="buySeedCap" ${seedCapLvl >= 10 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+
+    const autoPlantCost = Math.floor(80 * Math.pow(1.7, autoPlantLvl));
+    html += `<div class="shop-item"><span>🤖 Авто-посадка (ур.${autoPlantLvl}/20)</span><span>💰 ${autoPlantLvl >= 20 ? t('max') : autoPlantCost}</span><button id="buyAutoPlant" ${autoPlantLvl >= 20 ? 'disabled' : ''}>${t('buy')}</button></div>`;
+} else if (tab === 'starskins') {
         const allSkins = [
             {id:'star4', name:'✦ Четырёхконечная', cost:300},
             {id:'star5', name:'⭐ Пятиконечная', cost:350},
