@@ -474,9 +474,9 @@ function update() {
         }
     }
 
-    if (frameCount % Math.max(14, 45 - wave*1.2) === 0) {
-        spawnStar();
-    }
+if (fallingStars.length < 10) {
+    spawnStar();
+}
 
     for (let i = fallingStars.length-1; i >= 0; i--) {
         const star = fallingStars[i];
