@@ -982,40 +982,37 @@ function renderShop(tab) {
         });
         
         document.getElementById('buyPermMult')?.addEventListener('click', () => {
-            const cost = Math.floor(200 * Math.pow(2.0, permMultLvl-1));
-            if (coins >= cost && permMultLvl < 20) {
-                coins -= cost; permMultLvl++;
-                sfxBuy(); renderShop('perm');
-            }
-        });
-        document.getElementById('buyLuck')?.addEventListener('click', () => {
-            const cost = Math.floor(150*(luckLvl+1));
-            if (coins >= cost && luckLvl < 10) { coins -= cost; luckLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buySlowPerm')?.addEventListener('click', () => {
-            const cost = Math.floor(120*(slowPermLvl+1));
-            if (coins >= cost && slowPermLvl < 10) { coins -= cost; slowPermLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buyCursor')?.addEventListener('click', () => {
-            const cost = Math.floor(100*(catchRadiusLvl+1));
-            if (coins >= cost && catchRadiusLvl < 10) { coins -= cost; catchRadiusLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buyStarSize')?.addEventListener('click', () => {
-            const cost = Math.floor(150*(starSizeLvl+1));
-            if (coins >= cost && starSizeLvl < 10) { coins -= cost; starSizeLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buyAuto')?.addEventListener('click', () => {
-            const cost = Math.floor(300*(autoCollectLvl+1));
-            if (coins >= cost && autoCollectLvl < 5) { coins -= cost; autoCollectLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buySeedCap')?.addEventListener('click', () => {
-            const cost = Math.floor(250*seedCapLvl);
-            if (coins >= cost && seedCapLvl < 10) { coins -= cost; seedCapLvl++; sfxBuy(); renderShop('perm'); }
-        });
-        document.getElementById('buyAutoPlant')?.addEventListener('click', () => {
-            const cost = Math.floor(100*(autoPlantLvl+1));
-            if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
-        });
+    const cost = Math.floor(150 * Math.pow(1.6, permMultLvl - 1));
+    if (coins >= cost && permMultLvl < 20) { coins -= cost; permMultLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buyLuck')?.addEventListener('click', () => {
+    const cost = Math.floor(100 * Math.pow(1.7, luckLvl));
+    if (coins >= cost && luckLvl < 10) { coins -= cost; luckLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buySlowPerm')?.addEventListener('click', () => {
+    const cost = Math.floor(80 * Math.pow(1.7, slowPermLvl));
+    if (coins >= cost && slowPermLvl < 10) { coins -= cost; slowPermLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buyCursor')?.addEventListener('click', () => {
+    const cost = Math.floor(90 * Math.pow(1.7, catchRadiusLvl));
+    if (coins >= cost && catchRadiusLvl < 10) { coins -= cost; catchRadiusLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buyStarSize')?.addEventListener('click', () => {
+    const cost = Math.floor(70 * Math.pow(1.7, starSizeLvl));
+    if (coins >= cost && starSizeLvl < 10) { coins -= cost; starSizeLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buyAuto')?.addEventListener('click', () => {
+    const cost = Math.floor(500 * Math.pow(2.0, autoCollectLvl));
+    if (coins >= cost && autoCollectLvl < 5) { coins -= cost; autoCollectLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buySeedCap')?.addEventListener('click', () => {
+    const cost = Math.floor(200 * Math.pow(1.8, seedCapLvl - 1));
+    if (coins >= cost && seedCapLvl < 10) { coins -= cost; seedCapLvl++; sfxBuy(); renderShop('perm'); }
+});
+document.getElementById('buyAutoPlant')?.addEventListener('click', () => {
+    const cost = Math.floor(80 * Math.pow(1.7, autoPlantLvl));
+    if (coins >= cost && autoPlantLvl < 20) { coins -= cost; autoPlantLvl++; sfxBuy(); renderShop('perm'); }
+});
         
         document.querySelectorAll('.buySkin').forEach(b => b.addEventListener('click', () => {
             const skin = b.dataset.skin;
